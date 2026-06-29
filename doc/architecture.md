@@ -18,6 +18,25 @@ Aufteilung in 3 Hauptlayer:
   - Kommunikation mit DB etc.
   - Reines sperichern und laden, keine Logik!
 
+# Ordnerstruktur (lib)
+- lib
+    - front_layer
+      - widgets
+        => einzelne Widgets (zB. Snack- Item, Zahlenpad, etc.)
+      - views
+        => vollständige Seiten (zB Automaten-Ansicht, Admin-Ansicht)
+    - mid-layer
+      - models
+      - states?
+      - notifiers
+      - providers.dart
+      - weitere logik...
+    - back_layer
+      - DatabaseService
+  - main.dart
+
+
+
 # Prinzipieller Dataflow:
 (So in etwa)
 
@@ -34,3 +53,4 @@ User drückt Taste für Snack 'Nuka Cola'
     => price: 3.5
 => ML updated den State des Automaten-Displays
 => Display zeigt an: 'Gewähltes Produkt: Nuka Cola (verfügbar), Preis: € 3,50'
+
