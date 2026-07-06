@@ -35,7 +35,7 @@ Aufteilung in 3 Hauptlayer:
       - DatabaseService
   - main.dart
 
-
+...
 # User Interface
 
 <img src="../pics/Snackautomat UI.png" width="600">
