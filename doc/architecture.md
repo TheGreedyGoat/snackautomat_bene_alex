@@ -54,3 +54,19 @@ User drückt Taste für Snack 'Nuka Cola'
 => ML updated den State des Automaten-Displays
 => Display zeigt an: 'Gewähltes Produkt: Nuka Cola (verfügbar), Preis: € 3,50'
 
+# State Management
+- Unterscheidung zwischen persistenten und runtime-States
+- ### Runtime:
+  - Im allgemeinen der 'Bedienungs'- State des Automaten
+    - Aktueller Bezahlstand
+    - Ausgewählter Snack
+    - Beziehungen zwischen States über den virtuellen Input des Automaten
+      - Snack wählen
+      - Münzeinwurf
+      - Rückgabeknopf
+      - (ggf Automat schütteln?)
+- ### Persistent
+  - Überwiegend der State des Automaten-Inventars
+    - Wie viele von welchen Snacks sind gerade vorrätig?
+    - Wie viele von welchen Münzen sind gerade vorrätig?
+      - Umfasst nur die Münzen, die tatsächlich gerade im Tresor des Automaten liegen, nicht die, die gerade erst eingeworfen wurden
