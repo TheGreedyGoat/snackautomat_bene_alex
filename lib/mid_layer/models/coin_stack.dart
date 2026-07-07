@@ -131,7 +131,7 @@ class CoinStack {
     },
   );
 
-  /// Returns the summed up coin values as a readable formatted string
+  /// Returns the summed up coin values as a readable formatted String
   String get sumDisplay => MoneyConverter.centsToEutoDisplay(sum);
 
   @override
