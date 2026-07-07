@@ -22,12 +22,12 @@ class CoinStack {
         Coin.cents1: 0,
       };
 
-  /// Creates a Coin Stack wich has a random amount of [0-9] coins per type
+  /// Creates a Coin Stack wich has a random amount of [1-10] coins per type
   factory CoinStack.random() {
     final Map<Coin, int> coins = {};
     final Random random = Random();
     for (final coinType in Coin.values) {
-      coins[coinType] = random.nextInt(10);
+      coins[coinType] = 1 + random.nextInt(10);
     }
     return CoinStack.withCoins(coins);
   }
@@ -50,9 +50,7 @@ class CoinStack {
   /// Returns how many coins of the specified type are currently contained
   int getCoinAmount(Coin type) => _coins[type]!;
 
-  /// adds one coin of the specified type to the stack
-  ///
-  /// The amount must be positive
+  /// Returns a copy of this with one coin of the passed [type] added
   void addCoin(Coin type) {
     _coins.update(
       type,
@@ -60,12 +58,58 @@ class CoinStack {
     );
   }
 
-  /// reduces the amount of the specidfied coin type by 1
+  /// Returns a copy of this with one coin of the passed [type] removed as long as this has at least one of that kind
   void removeCoin(Coin type) {
     _coins.update(
       type,
       (value) => max(value - 1, 0),
     );
+  }
+
+  /// copies this CoinStack and adds/ substracts all non null values within [diff] to the copie's coins
+  /// ```dart
+  /// final original = CoinStack.withCoins({
+  ///    Coin.euro2: 3,
+  ///    Coin.euro1: 0,
+  ///    Coin.cents50: 5,
+  ///  });
+  ///
+  ///  final copy = original.copyWithDifference({
+  ///    Coin.euro2: -1,
+  ///    Coin.cents20: 1,
+  ///  });
+  ///  print(copy);
+  ///  /**
+  ///     * {
+  ///        Coin.euro2: 2,
+  ///        Coin.euro1: 0,
+  ///        Coin.cents50: 5,
+  ///        Coin.cents20: 1,
+  ///        };
+  ///     */
+  /// ```
+  CoinStack copyWithDifference(Map<Coin, int> diff) {
+    final copy = fullCopy;
+    copy._coins.updateAll(
+      (key, value) {
+        return max(value + (diff[key] ?? 0), 0);
+      },
+    );
+
+    return copy;
+  }
+
+  /// returns a copy of this.
+  ///
+  /// For every [Coin] key in replace that has a value, that value overrides the old one. For every other key the value of this is used
+  CoinStack copyWith(Map<Coin, int> replace) {
+    final copy = fullCopy;
+    copy._coins.updateAll(
+      (key, value) {
+        return replace[key] ?? _coins[key] ?? 0;
+      },
+    );
+    return copy;
   }
 
   /// Returns the biggest coin available in this stack that is worth less or equal the given amount or null, if no such coin is available
@@ -122,4 +166,15 @@ class CoinStack {
 
   @override
   String toString() => _coins.toString();
+
+  @override
+  bool operator ==(Object other) {
+    return other is CoinStack && other._coins == _coins;
+  }
+
+  @override
+  int get hashCode => _coins.hashCode ^ 'CoinStack'.hashCode;
+
+  /// returns a new Coinstack wich has the combined Coins of both operands
+  CoinStack operator +(CoinStack other) => copyWithDifference(other._coins);
 }
