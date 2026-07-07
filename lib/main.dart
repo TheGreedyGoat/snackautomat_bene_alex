@@ -1,10 +1,16 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:my_utils/utility/formatters.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/notifiers/coin_stack_notifier.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    ProviderScope(
+      child: MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -22,25 +28,28 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class CoinStackDisplay extends StatefulWidget {
+final coinStackTestProvider = NotifierProvider(
+  () => CoinStackNotifier(),
+);
+
+class CoinStackDisplay extends ConsumerStatefulWidget {
   const CoinStackDisplay({super.key});
 
   @override
-  State<CoinStackDisplay> createState() => _CoinStackDisplayState();
+  ConsumerState<CoinStackDisplay> createState() => _CoinStackDisplayState();
 }
 
-class _CoinStackDisplayState extends State<CoinStackDisplay> {
-  late CoinStack stack;
+class _CoinStackDisplayState extends ConsumerState<CoinStackDisplay> {
   late final TextEditingController controller;
   @override
   void initState() {
     super.initState();
-    stack = CoinStack.empty();
     controller = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
+    final stack = ref.watch(coinStackTestProvider);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,9 +63,9 @@ class _CoinStackDisplayState extends State<CoinStackDisplay> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        stack.addCoin(coinType);
-                      });
+                      ref
+                          .read(coinStackTestProvider.notifier)
+                          .addCoin(coinType);
                     },
                     child: Text('+'),
                   ),
@@ -65,9 +74,9 @@ class _CoinStackDisplayState extends State<CoinStackDisplay> {
 
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        stack.removeCoin(coinType);
-                      });
+                      ref
+                          .read(coinStackTestProvider.notifier)
+                          .removeCoin(coinType);
                     },
                     child: Text('-'),
                   ),
@@ -91,9 +100,10 @@ class _CoinStackDisplayState extends State<CoinStackDisplay> {
                 );
                 if (value != null) {
                   print(
-                    stack.tryRemoveAmount(Formatters.doubleToInt(value, 2)),
+                    ref
+                        .read(coinStackTestProvider.notifier)
+                        .tryRemoveAmount(Formatters.doubleToInt(value, 2)),
                   );
-                  setState(() {});
                 }
               },
               child: Text('Remove amount'),
@@ -101,15 +111,14 @@ class _CoinStackDisplayState extends State<CoinStackDisplay> {
           ],
         ),
         OutlinedButton(
-          onPressed: () => setState(() {
-            stack = CoinStack.random();
-          }),
+          onPressed: () => setState(
+            () => ref.read(coinStackTestProvider.notifier).setRandom(),
+          ),
           child: Text('random'),
         ),
         OutlinedButton(
-          onPressed: () => setState(() {
-            stack = CoinStack.empty();
-          }),
+          onPressed: () =>
+              setState(() => ref.read(coinStackTestProvider.notifier).clear()),
           child: Text('Reset'),
         ),
       ],

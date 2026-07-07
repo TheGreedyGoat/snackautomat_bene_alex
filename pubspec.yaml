@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_riverpod: ^3.3.2
   my_utils:
     git: https://github.com/TheGreedyGoat/my_utils.git
 dev_dependencies:

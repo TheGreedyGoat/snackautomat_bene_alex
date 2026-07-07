@@ -1,4 +1,3 @@
-import 'package:my_utils/utility/formatters.dart';
 import 'package:my_utils/utility/money_converter.dart';
 
 /// Respräsentiert die unterstützten Münzarten
