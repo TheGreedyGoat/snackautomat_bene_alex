@@ -10,17 +10,16 @@ class CoinStackNotifier extends Notifier<CoinStack> {
   }
 
   /// Add one coin of the specified type
-  void addCoin(Coin coinType) {
-    final newState = state.fullCopy;
-    newState.addCoin(coinType);
-    state = newState;
-  }
+  void addCoin(Coin coinType) =>
+      state = state.copyWithDifference({coinType: 1});
 
   /// remove one coin of the specified type, if the stack has at least one
-  void removeCoin(Coin coinType) {
-    final newState = state.fullCopy;
-    newState.removeCoin(coinType);
-    state = newState;
+  bool removeCoin(Coin coinType) {
+    final canRemove = state.hasCoinOfType(coinType);
+    if (canRemove) {
+      state = state.copyWithDifference({coinType: -1});
+    }
+    return canRemove;
   }
 
   /// checks if there is any combination of coins with in the stack, that adds up to the passed [amount]
@@ -32,13 +31,13 @@ class CoinStackNotifier extends Notifier<CoinStack> {
     final CoinStack change = CoinStack.empty();
 
     while (amount >= 0.01) {
-      Coin? nextToRemove = newState.getHighestCoinBelowAmount(amount);
+      Coin? nextToRemove = newState.tryGetHighestCoinBelowAmount(amount);
       if (nextToRemove == null) {
         return null;
       } else {
         change.addCoin(nextToRemove);
         newState.removeCoin(nextToRemove);
-        amount -= nextToRemove.worthInCents;
+        amount -= nextToRemove.worth;
       }
     }
     state = newState;

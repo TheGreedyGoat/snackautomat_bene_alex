@@ -27,9 +27,9 @@ enum Coin {
   cents1(1);
 
   /// Der zugehörige Wert der Münze
-  final int worthInCents;
-  const Coin(this.worthInCents);
+  final int worth;
+  const Coin(this.worth);
 
   // @override
-  String toString() => MoneyConverter.centsToEutoDisplay(worthInCents);
+  String toString() => MoneyConverter.centsToEutoDisplay(worth);
 }

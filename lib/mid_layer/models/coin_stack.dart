@@ -52,6 +52,8 @@ class CoinStack {
   int getCoinAmount(Coin type) => _coins[type]!;
 
   /// Returns a copy of this with one coin of the passed [type] added
+  ///
+  /// If this Coinstack is used within a notifier use the notifier's add/ removeCoin instead
   void addCoin(Coin type) {
     _coins.update(
       type,
@@ -60,12 +62,17 @@ class CoinStack {
   }
 
   /// Returns a copy of this with one coin of the passed [type] removed as long as this has at least one of that kind
+  ///
+  /// If this Coinstack is used within a notifier use the notifier's add/ removeCoin instead
   void removeCoin(Coin type) {
     _coins.update(
       type,
       (value) => max(value - 1, 0),
     );
   }
+
+  ///  returns true if this CoinStack contains at least 1 coin of the type [coinType]
+  bool hasCoinOfType(Coin coinType) => getCoinAmount(coinType) > 0;
 
   /// copies this CoinStack and adds/ substracts all non null values within [diff] to the copie's coins
   /// ```dart
@@ -113,9 +120,9 @@ class CoinStack {
   }
 
   /// Returns the biggest coin available in this stack that is worth less or equal the given amount or null, if no such coin is available
-  Coin? getHighestCoinBelowAmount(int amount) {
+  Coin? tryGetHighestCoinBelowAmount(int amount) {
     for (final coinType in _coins.keys) {
-      if ((coinType.worthInCents <= amount) && _coins[coinType]! > 0) {
+      if ((coinType.worth <= amount) && _coins[coinType]! > 0) {
         return coinType;
       }
     }
@@ -127,7 +134,7 @@ class CoinStack {
   int get sum => _coins.keys.fold(
     0,
     (previousValue, coinType) {
-      return previousValue + coinType.worthInCents * _coins[coinType]!;
+      return previousValue + coinType.worth * _coins[coinType]!;
     },
   );
 
