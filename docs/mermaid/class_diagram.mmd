@@ -2,15 +2,19 @@
 title: Klassendiagramm
 ---
 classDiagram
-    class SnackMachine{
+    class SnackMachineInventory{
         - List~Snack~ snacks
         - CoinStack coinStorage
     }
+    class SnackSlot{
+        + Snack Snack
+        + int amount
+        + reduce()
+    }
+
     class Snack{
         + String name
         + int price
-        + int amount
-        + reduce()
     }
     
     class CoinStack{
@@ -49,9 +53,10 @@ classDiagram
     }
     class NoSelectionState{}
 
-SnackMachine "1" o-- "0..*" Snack: contains
-SnackMachine "1" o-- "1" CoinStack: contains
-SnackMachine "1" o-- "1" VendingState: has
+SnackMachineInventory "1" o-- "1..*" SnackSlot: has
+SnackMachineInventory "1" o-- "1" CoinStack: contains
+SnackMachineInventory "1" o-- "1" VendingState: has
 CoinStack "1" *-- "0..n" Coin: consits of
+SnackSlot "1" o-- "0..*" Snack: cointains
 VendingState <|-- IdleState
 VendingState <|-- NoSelectionState

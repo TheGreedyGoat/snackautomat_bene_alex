@@ -1,10 +1,8 @@
 stateDiagram-v2
     idle
-    noSnack: No Snack Selected
     waitCoins: Wait for Coins
+    noSnack: No Snack Selected
 
-    InsCoin0: credit += coin
-    InsCoin1: credit += coin
     dispCoins: Dispense Coins
     dispSnack: Dispense Snack
 
@@ -22,23 +20,25 @@ stateDiagram-v2
     AnyManualState --> dispCoins : return pressed
     dispCoins --> idle : onFinished 
     idle --> dSnack : select snack
-    idle --> InsCoin0: insert coin
+    idle --> noSnack: insert coin
 
-    InsCoin0 --> noSnack
 
-    noSnack --> InsCoin0: insertCoin
+    noSnack --> noSnack: insertCoin
     noSnack --> dSnack: select snack
 
     snack_av --> dPrice : YES
     snack_av --> noSnack : NO
 
+
     price_paid --> dReturn: YES
     price_paid --> waitCoins: NO
 
 
-    waitCoins --> InsCoin1 : insert coin
+    waitCoins --> dPrice: insert coin
     waitCoins --> dSnack: snack selected
 
     return_possible --> dispSnack: YES
     return_possible --> noSnack: NO
+
+    dispSnack --> noSnack: on finished
 

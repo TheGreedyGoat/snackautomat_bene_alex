@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_dispense.dart';
 import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_purse.dart';
 import 'package:snackautomat_bene_alex/test_app/test_widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_dispende.dart';
+import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_dispense.dart';
 import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_view.dart';
 
-void main() {
+void runTestApp() {
   runApp(
     ProviderScope(
       child: VendingTestApp(),

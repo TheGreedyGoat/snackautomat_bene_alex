@@ -51,24 +51,41 @@ class CoinStack {
   /// Returns how many coins of the specified type are currently contained
   int getCoinAmount(Coin type) => _coins[type]!;
 
-  /// Returns a copy of this with one coin of the passed [type] added
+  int get totalCoins => coins.values.fold(
+    0,
+    (previousValue, element) => previousValue + element,
+  );
+
+  /// Returns a copy of this with one coin of the passed [coinType] added
   ///
   /// If this Coinstack is used within a notifier use the notifier's add/ removeCoin instead
-  void addCoin(Coin type) {
+  void addCoin(Coin coinType) {
     _coins.update(
-      type,
+      coinType,
       (value) => value + 1,
     );
   }
 
-  /// Returns a copy of this with one coin of the passed [type] removed as long as this has at least one of that kind
+  /// Returns a copy of this with one coin of the passed [coinType] removed as long as this has at least one of that kind
   ///
   /// If this Coinstack is used within a notifier use the notifier's add/ removeCoin instead
-  void removeCoin(Coin type) {
+  bool tryRemoveCoin(Coin coinType) {
+    if (_coins[coinType]! <= 0) {
+      return false;
+    }
     _coins.update(
-      type,
-      (value) => max(value - 1, 0),
+      coinType,
+      (value) => value - 1,
     );
+    return true;
+  }
+
+  bool tryTransferCoin(Coin coinType, CoinStack target) {
+    if (!tryRemoveCoin(coinType)) {
+      return false;
+    }
+    target.addCoin(coinType);
+    return true;
   }
 
   ///  returns true if this CoinStack contains at least 1 coin of the type [coinType]
@@ -106,9 +123,9 @@ class CoinStack {
     return copy;
   }
 
-  /// returns a copy of this.
+  /// Works similar to a classic copyWith()
   ///
-  /// For every [Coin] key in replace that has a value, that value overrides the old one. For every other key the value of this is used
+  /// The copy will keep the values of this, whereever [replace] does not has an entry
   CoinStack copyWith(Map<Coin, int> replace) {
     final copy = fullCopy;
     copy._coins.updateAll(

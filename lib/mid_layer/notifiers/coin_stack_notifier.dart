@@ -36,7 +36,7 @@ class CoinStackNotifier extends Notifier<CoinStack> {
         return null;
       } else {
         change.addCoin(nextToRemove);
-        newState.removeCoin(nextToRemove);
+        newState.tryRemoveCoin(nextToRemove);
         amount -= nextToRemove.worth;
       }
     }

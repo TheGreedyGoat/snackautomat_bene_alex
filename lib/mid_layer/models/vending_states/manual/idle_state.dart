@@ -1,10 +1,10 @@
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/no_selection_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
 class IdleState extends ManualState {
-  IdleState() : super(credit: 0, selectedSnack: null);
+  IdleState() : super(credit: 0, selectedSlot: null);
 
   @override
   VendingState onCoinInserted(Coin coin) {

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/widgets.dart';
-import 'package:my_utils/utility/money_converter.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
+import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_card.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/test_providers.dart';
 
 class SnackView extends ConsumerWidget {
   const SnackView({super.key});
@@ -13,7 +11,7 @@ class SnackView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final snacks = ref.watch(inventoryProvider);
     return snacks.when(
-      data: (data) => showSnacks(data.snackStorage),
+      data: (data) => showSnacks(data.snackStorage.length),
       error: (error, stackTrace) => Center(
         child: Text('Fehler'),
       ),
@@ -21,16 +19,16 @@ class SnackView extends ConsumerWidget {
     );
   }
 
-  Widget showSnacks(List<SnackTMP> snacks) {
+  Widget showSnacks(int numSnacks) {
     return ListView.builder(
-      itemCount: (snacks.length / 3).ceil(),
+      itemCount: (numSnacks / 3).ceil(),
       itemBuilder: (context, i) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             for (int j = 0; j < 3; j++)
-              if (_index(i, j) < snacks.length)
-                SnackCard(snack: snacks[_index(i, j)])
+              if (_index(i, j) < numSnacks)
+                SnackSlotCard(snackIndex: _index(i, j))
               else
                 SizedBox.square(
                   dimension: 200,

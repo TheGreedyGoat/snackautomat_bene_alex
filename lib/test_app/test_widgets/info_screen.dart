@@ -1,14 +1,54 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:my_utils/utility/money_converter.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
-class InfoScreen extends ConsumerWidget {
+class InfoScreen extends ConsumerStatefulWidget {
   const InfoScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(vendingStateProvider);
+  ConsumerState<InfoScreen> createState() => _InfoScreenState();
+}
+
+class _InfoScreenState extends ConsumerState<InfoScreen> {
+  late final Timer timer;
+  String title = 'NUKA COLA =*= ' * 5;
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(
+      Duration(milliseconds: 500),
+      (timer) {
+        scrollTitle();
+      },
+    );
+  }
+
+  void scrollTitle() {
+    setState(() {
+      final lastChar = title[title.length - 1];
+      title = title.replaceRange(title.length - 1, null, '');
+      title = '$lastChar$title';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vendingState = ref.watch(vendingStateProvider);
+    final int? index = vendingState.selectedSlot;
+    final String credit = vendingState.creditDisplay;
+    String name = 'noData';
+    String price = 'noData';
+    ref.watch(inventoryProvider).whenData(
+      (value) {
+        name = value.getNameOfSnack(index);
+        final p = value.getPrice(index);
+        price = p == null ? '-,--' : MoneyConverter.centsToEutoDisplay(p);
+      },
+    );
+
     return Card(
       color: Colors.black,
       child: SizedBox(
@@ -20,8 +60,7 @@ class InfoScreen extends ConsumerWidget {
             children: [
               Column(
                 children: [
-                  green('VAULT TECH INDUSTRIES'),
-                  green('(${state.runtimeType})'),
+                  green(title, 30),
                   SizedBox(
                     height: 1,
                     child: Container(
@@ -30,15 +69,18 @@ class InfoScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              green('AUSWAHL: ${state.selectedSnack?.name ?? '---'}'),
+
+              green(
+                'AUSWAHL: $name',
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   green(
-                    'Preis: ${state.selectedSnack != null ? MoneyConverter.centsToEutoDisplay(state.selectedSnack!.price) : '-.--'}',
+                    'Preis: $price',
                   ),
                   green(
-                    'Kredit: ${MoneyConverter.centsToEutoDisplay(state.credit)}',
+                    'Kredit: $credit',
                   ),
                 ],
               ),
@@ -49,8 +91,17 @@ class InfoScreen extends ConsumerWidget {
     );
   }
 
-  Text green(String data) => Text(
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  Text green(String data, [double? fontSize]) => Text(
     data,
-    style: TextStyle(color: Colors.green),
+    style: TextStyle(color: Colors.green, fontSize: fontSize),
+    overflow: TextOverflow.clip,
+    softWrap: false,
+    maxLines: 1,
   );
 }
