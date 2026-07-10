@@ -48,6 +48,10 @@ class CoinStack {
   /// The amount of each coin type in this stack
   Map<Coin, int> get coins => {..._coins};
 
+  Map<Coin, int> get coinsNegative => _coins.map(
+    (key, value) => MapEntry(key, -value),
+  );
+
   /// Returns how many coins of the specified type are currently contained
   int getCoinAmount(Coin type) => _coins[type]!;
 

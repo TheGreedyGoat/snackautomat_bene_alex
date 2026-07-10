@@ -9,21 +9,18 @@ class SnackDispense extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    late final SnackTMP? snack;
-    ref
-        .watch(inventoryProvider)
-        .whenData(
-          (value) => snack = value.ejectedSnack,
-        );
+    final state = ref.watch(snackMachineProvider);
+
+    late final SnackTMP? snack = state.ejectedSnack;
     return GestureDetector(
       onTap: () {
-        ref.read(inventoryProvider.notifier).emptyDispenseSlot();
+        ref.read(snackMachineProvider.notifier).emptyDispenseSlot();
       },
       child: Card(
         margin: const EdgeInsets.all(16.0),
         child: SizedBox.expand(
           child: Center(
-            child: snack != null ? Text(snack!.name) : null,
+            child: Text(snack?.name ?? '=========='),
           ),
         ),
       ),

@@ -3,7 +3,11 @@ import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_st
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
 class NoSelectionState extends ManualState {
-  NoSelectionState({required super.credit});
+  NoSelectionState({
+    required super.credit,
+    super.displayMessage = 'Bitte wählen Sie',
+    super.hasError,
+  });
 
   @override
   VendingState onCoinInserted(Coin coin) {

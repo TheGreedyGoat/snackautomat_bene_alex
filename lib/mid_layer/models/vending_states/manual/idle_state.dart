@@ -4,7 +4,8 @@ import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/no
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
 class IdleState extends ManualState {
-  IdleState() : super(credit: 0, selectedSlot: null);
+  IdleState({super.displayMessage = 'Willkommen!', super.hasError})
+    : super(credit: 0, selectedSlot: null);
 
   @override
   VendingState onCoinInserted(Coin coin) {

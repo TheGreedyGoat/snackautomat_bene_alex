@@ -3,7 +3,12 @@ import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_st
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
 class PayState extends ManualState {
-  PayState({required super.credit, required super.selectedSlot});
+  PayState({
+    required super.credit,
+    required super.selectedSlot,
+    super.displayMessage = 'Bitte bezahlen',
+    super.hasError,
+  });
 
   @override
   VendingState onCoinInserted(Coin coin) {

@@ -5,8 +5,13 @@ import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
 class SnackSlotCard extends ConsumerStatefulWidget {
-  const SnackSlotCard({required this.snackIndex, super.key});
+  const SnackSlotCard({
+    required this.snackIndex,
+    required this.dimension,
+    super.key,
+  });
   final int snackIndex;
+  final double dimension;
 
   @override
   ConsumerState<SnackSlotCard> createState() => _SnackCardState();
@@ -18,11 +23,14 @@ class _SnackCardState extends ConsumerState<SnackSlotCard> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(snackMachineProvider);
+    final snackSlot = state.getSlot(index);
     return GestureDetector(
       onTap: () {
-        ref.read(vendingStateProvider.notifier).onSlotSelected(index);
+        ref.read(snackMachineProvider.notifier).onSlotSelected(index);
       },
       child: Card(
+        margin: const EdgeInsets.all(0),
         color: isHovered ? Colors.red.shade200 : Colors.grey,
         elevation: isHovered ? 8 : 2,
         shape: RoundedRectangleBorder(
@@ -33,44 +41,28 @@ class _SnackCardState extends ConsumerState<SnackSlotCard> {
           ),
         ),
         child: SizedBox.square(
-          dimension: 200,
-          child: ref
-              .watch(inventoryProvider)
-              .when(
-                data: (data) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(),
-                      Text(
-                        data.getNameOfSnack(index),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            data.getPrice(index) == null
-                                ? '-,--'
-                                : MoneyConverter.centsToEutoDisplay(
-                                    data.getPrice(index)!,
-                                  ),
-                          ),
-                          Text(
-                            data.getAmount(index) == null
-                                ? '/'
-                                : data.getAmount(index)!.toString(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-                error: (error, stackTrace) => Center(
-                  child: Text('ERROR'),
-                ),
-                loading: () => CircularProgressIndicator(),
+          dimension: widget.dimension,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(),
+              Text(
+                snackSlot?.snackName ?? 'N/A',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    snackSlot?.priceDisplay ?? '-,--',
+                  ),
+                  Text(
+                    snackSlot?.amount.toString() ?? '--',
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

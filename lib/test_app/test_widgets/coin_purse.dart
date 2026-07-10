@@ -20,7 +20,7 @@ class CoinPurse extends ConsumerWidget {
                   alignment: AlignmentGeometry.center,
                 ),
                 onPressed: () {
-                  ref.read(vendingStateProvider.notifier).onCoinInserted(coin);
+                  ref.read(snackMachineProvider.notifier).onCoinInserted(coin);
                 },
                 child: SizedBox.square(
                   dimension: 70,

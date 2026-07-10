@@ -36,38 +36,52 @@ class MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Card(
-            color: Colors.blueGrey,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SnackView(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final snackViewWidth = constraints.maxWidth - 8 - 500;
+        final snackViewHeight = constraints.maxHeight - 8 - 250;
+        return Column(
+          children: [
+            Expanded(
+              child: Card(
+                margin: const EdgeInsets.all(4.0),
+                color: Colors.blueGrey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: SnackView(
+                              width: snackViewWidth,
+                              height: snackViewHeight,
+                            ),
+                          ),
+                          ControlPad(), // 500 - 8
+                        ],
                       ),
-                      ControlPad(),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 250,
+                      child: Row(
+                        children: [
+                          Expanded(child: SnackDispense()),
+                          CoinDispense(),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  height: 250,
-                  child: Row(
-                    children: [
-                      Expanded(child: SnackDispense()),
-                      CoinDispense(),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-        SizedBox(height: 100, child: CoinPurse()),
-      ],
+            SizedBox(height: 100, child: CoinPurse()),
+          ],
+        );
+      },
     );
   }
+
+  // double _getAvailableWidth(BuildContext context){
+  //   MediaQuery.of(context);
+  // }
 }

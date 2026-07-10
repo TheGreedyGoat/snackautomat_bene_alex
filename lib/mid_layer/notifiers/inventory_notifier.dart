@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_machine_inventory.dart';
 
@@ -63,7 +62,7 @@ class InventoryNotifier extends AsyncNotifier<SnackMachineInventory> {
     return chng;
   }
 
-  bool tryGetChange(int amount) {
+  bool dispenseChange(int amount) {
     final change = checkForChange(amount);
     final success = change != null;
     if (success) {

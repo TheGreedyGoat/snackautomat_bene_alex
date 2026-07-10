@@ -8,7 +8,7 @@ class InventoryOverview extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final storage = ref.watch(inventoryProvider);
+    final state = ref.watch(snackMachineProvider);
 
     return Column(
       children: [
@@ -16,29 +16,21 @@ class InventoryOverview extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [Container(), Text('Storage'), Text('Change')],
         ),
-        storage.when(
-          data: (data) {
-            final storage = data.coinStorage;
-            final change = data.changeSlot;
-            return Column(
-              children: Coin.values.map(
-                (coin) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(coin.toString()),
-                      Text(
-                        storage.getCoinAmount(coin).toString(),
-                      ),
-                      Text(change.getCoinAmount(coin).toString()),
-                    ],
-                  );
-                },
-              ).toList(),
-            );
-          },
-          error: (error, stackTrace) => Text('Error'),
-          loading: () => Text('Loading'),
+        Column(
+          children: Coin.values.map(
+            (coin) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(coin.toString()),
+                  Text(
+                    state.coinStorage.getCoinAmount(coin).toString(),
+                  ),
+                  Text(state.changeSlot.getCoinAmount(coin).toString()),
+                ],
+              );
+            },
+          ).toList(),
         ),
       ],
     );

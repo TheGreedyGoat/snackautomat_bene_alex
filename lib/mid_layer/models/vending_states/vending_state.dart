@@ -1,15 +1,18 @@
 import 'package:my_utils/utility/money_converter.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
 
 abstract class VendingState {
   final int credit;
   final int? selectedSlot;
   final bool acceptsInput;
+  final String displayMessage;
+  final bool hasError;
   VendingState({
     required this.credit,
     required this.acceptsInput,
+    required this.displayMessage,
     this.selectedSlot,
+    this.hasError = false,
   });
 
   VendingState onSnackSelected(int slot);

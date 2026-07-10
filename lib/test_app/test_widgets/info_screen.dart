@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:my_utils/utility/money_converter.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
 class InfoScreen extends ConsumerStatefulWidget {
@@ -36,18 +34,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final vendingState = ref.watch(vendingStateProvider);
-    final int? index = vendingState.selectedSlot;
-    final String credit = vendingState.creditDisplay;
-    String name = 'noData';
-    String price = 'noData';
-    ref.watch(inventoryProvider).whenData(
-      (value) {
-        name = value.getNameOfSnack(index);
-        final p = value.getPrice(index);
-        price = p == null ? '-,--' : MoneyConverter.centsToEutoDisplay(p);
-      },
-    );
+    final state = ref.watch(snackMachineProvider);
+    final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
 
     return Card(
       color: Colors.black,
@@ -60,7 +48,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
             children: [
               Column(
                 children: [
-                  green(title, 30),
+                  _text(title, 30),
+                  _text(state.vendingState.runtimeType.toString()),
                   SizedBox(
                     height: 1,
                     child: Container(
@@ -70,17 +59,27 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                 ],
               ),
 
-              green(
-                'AUSWAHL: $name',
+              _text(
+                'AUSWAHL: ${selectedSlot?.snackName ?? '---'}',
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  green(
-                    'Preis: $price',
+                  _text(
+                    state.vendingState.displayMessage,
+                    null,
+                    state.vendingState.hasError,
                   ),
-                  green(
-                    'Kredit: $credit',
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _text(
+                        'Preis: ${selectedSlot?.price ?? '--,-'}',
+                      ),
+                      _text(
+                        'Kredit: ${state.vendingState.creditDisplay}',
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -97,9 +96,12 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
     super.dispose();
   }
 
-  Text green(String data, [double? fontSize]) => Text(
+  Text _text(String data, [double? fontSize, bool hasError = false]) => Text(
     data,
-    style: TextStyle(color: Colors.green, fontSize: fontSize),
+    style: TextStyle(
+      color: hasError ? Colors.red : Colors.green,
+      fontSize: fontSize,
+    ),
     overflow: TextOverflow.clip,
     softWrap: false,
     maxLines: 1,

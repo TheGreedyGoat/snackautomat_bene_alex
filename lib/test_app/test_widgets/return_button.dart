@@ -25,7 +25,7 @@ class _ReturnButtonState extends ConsumerState<ReturnButton> {
           isHovered = value;
         },
         onPressed: () {
-          ref.read(vendingStateProvider.notifier).onReturnPressed();
+          ref.read(snackMachineProvider.notifier).onReturnPressed();
         },
         child: Text(
           'R',
