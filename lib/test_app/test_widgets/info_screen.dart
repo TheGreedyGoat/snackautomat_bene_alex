@@ -12,7 +12,7 @@ class InfoScreen extends ConsumerStatefulWidget {
 
 class _InfoScreenState extends ConsumerState<InfoScreen> {
   late final Timer timer;
-  String title = 'NUKA COLA =*= ' * 5;
+  String title = 'NUKA COLA *=* ' * 5;
   @override
   void initState() {
     super.initState();
@@ -48,14 +48,20 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
             children: [
               Column(
                 children: [
-                  _text(title, 30),
-                  _text(state.vendingState.runtimeType.toString()),
                   SizedBox(
                     height: 1,
                     child: Container(
                       color: Colors.green,
                     ),
                   ),
+                  _text(title, 30),
+                  SizedBox(
+                    height: 1,
+                    child: Container(
+                      color: Colors.green,
+                    ),
+                  ),
+                  // _text(state.vendingState.runtimeType.toString()),
                 ],
               ),
 
@@ -74,7 +80,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _text(
-                        'Preis: ${selectedSlot?.snackPrice ?? '--,-'}',
+                        'Preis: ${selectedSlot?.priceDisplay ?? '--,-'}',
                       ),
                       _text(
                         'Kredit: ${state.vendingState.creditDisplay}',
@@ -100,7 +106,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
     data,
     style: TextStyle(
       color: hasError ? Colors.red : Colors.green,
-      fontSize: fontSize,
+      fontFamily: 'FixedSys',
+      fontSize: fontSize ?? 20,
     ),
     overflow: TextOverflow.clip,
     softWrap: false,

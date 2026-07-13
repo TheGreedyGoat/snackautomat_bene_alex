@@ -32,12 +32,12 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   @override
   SnackMachineState build() => SnackMachineState(
     coinStorage: CoinStack.withCoins(
-      {for (final c in Coin.values) c: 1},
+      {for (final c in Coin.values) c: 10},
     ),
     changeSlot: CoinStack.empty(),
     snackStorage: _exampleSnacks
         .map(
-          (e) => SnackSlot(snack: e, amount: 1),
+          (e) => SnackSlot(snack: e, amount: 3),
         )
         .toList(),
     vendingState: IdleState(),
@@ -80,17 +80,16 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
 
   Timer? _resetTimer;
 
-  void _ceckPaidAndDispense() {
+  void _checkPaidAndDispense() {
     int? snackIndex = vendingState.selectedSlot;
     int? price = state.getSlot(snackIndex)?.snackPrice;
-    print('price: $price\n credit: ${vendingState.credit}');
-    if (price == null) return;
+    print(' checkPaid\nprice: $price\n credit: ${vendingState.credit}');
+    if (price == null || vendingState.credit < price) return;
 
-    if (vendingState.credit >= price &&
-        checkForChange(
-              vendingState.credit - price,
-            ) !=
-            null) {
+    if (checkForChange(
+          vendingState.credit - price,
+        ) !=
+        null) {
       vendingState = DispenseSnackState(
         credit: vendingState.credit - price,
         selectedSlot: vendingState.selectedSlot,
@@ -109,7 +108,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     if (!vendingState.acceptsInput) return;
     if (state.snackAvailable(slot)) {
       vendingState = vendingState.onSnackSelected(slot);
-      _ceckPaidAndDispense();
+      _checkPaidAndDispense();
     } else {
       vendingState = NoSelectionState(
         credit: vendingState.credit,
@@ -124,7 +123,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     if (!vendingState.acceptsInput) return;
     vendingState = vendingState.onCoinInserted(coin);
     state = state.insertCoin(coin);
-    _ceckPaidAndDispense();
+    _checkPaidAndDispense();
   }
 
   /// call, when the user prsses the snack machine's return button
@@ -161,7 +160,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   CoinStack? checkForChange(int amount) {
     final storage = state.coinStorage.fullCopy;
     final change = state.changeSlot.fullCopy;
-    while (amount >= 0) {
+    while (amount > 0) {
       Coin? nextToRemove = storage.tryGetHighestCoinBelowAmount(amount);
       if (nextToRemove == null) {
         return null;

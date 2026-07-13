@@ -25,3 +25,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/nuka_cola_sign/
+  fonts:
+    - family: FixedSys
+      fonts:
+        - asset: assets/images/nuka_cola_sign/fonts/FSEX300.ttf
