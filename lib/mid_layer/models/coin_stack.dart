@@ -48,6 +48,7 @@ class CoinStack {
   /// The amount of each coin type in this stack
   Map<Coin, int> get coins => {..._coins};
 
+  /// returns the negative of all coin amounts (used for copyWithDifference)
   Map<Coin, int> get coinsNegative => _coins.map(
     (key, value) => MapEntry(key, -value),
   );
@@ -55,6 +56,7 @@ class CoinStack {
   /// Returns how many coins of the specified type are currently contained
   int getCoinAmount(Coin type) => _coins[type]!;
 
+  /// The total number of all coins contained
   int get totalCoins => coins.values.fold(
     0,
     (previousValue, element) => previousValue + element,
@@ -84,6 +86,9 @@ class CoinStack {
     return true;
   }
 
+  /// If this contains at least one coin of [coinType], it will be transferred to [target] and true is returned
+  ///
+  /// returns fals else
   bool tryTransferCoin(Coin coinType, CoinStack target) {
     if (!tryRemoveCoin(coinType)) {
       return false;

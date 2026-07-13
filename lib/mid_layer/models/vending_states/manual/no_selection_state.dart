@@ -2,7 +2,9 @@ import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
+/// The machine has a credit > 0 but no snack is selected
 class NoSelectionState extends ManualState {
+  /// The machine has a credit > 0 but no snack is selected
   NoSelectionState({
     required super.credit,
     super.displayMessage = 'Bitte wählen Sie',
@@ -16,10 +18,5 @@ class NoSelectionState extends ManualState {
     return NoSelectionState(
       credit: newCredit,
     );
-  }
-
-  @override
-  VendingState onSnackSelected(int slot) {
-    return super.onSnackSelected(slot);
   }
 }

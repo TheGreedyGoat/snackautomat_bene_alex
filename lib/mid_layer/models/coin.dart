@@ -30,6 +30,6 @@ enum Coin {
   final int worth;
   const Coin(this.worth);
 
-  // @override
+  @override
   String toString() => MoneyConverter.centsToEutoDisplay(worth);
 }

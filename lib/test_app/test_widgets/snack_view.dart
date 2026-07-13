@@ -9,7 +9,8 @@ class SnackView extends ConsumerWidget {
   const SnackView({required this.width, required this.height, super.key});
   final double width;
   final double height;
-  static const dimension = 100.0;
+  final double spacing = 16.0;
+  static const dimension = 250.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,18 +19,18 @@ class SnackView extends ConsumerWidget {
   }
 
   Widget showSnacks(int numSnacks) {
-    final columns = max((width / dimension).floor(), 1);
+    final columns = max((width / (dimension + spacing / 2)).floor(), 1);
     return ListView.builder(
       itemCount: (numSnacks / columns).ceil(),
       itemBuilder: (context, i) {
         return Column(
           children: [
             SizedBox(
-              // height: spacing,
+              height: spacing,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              // spacing: spacing,
+              spacing: spacing,
               children: [
                 for (int j = 0; j < columns; j++)
                   if (_index(i, j, columns) < numSnacks)

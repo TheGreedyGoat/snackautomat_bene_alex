@@ -1,10 +1,11 @@
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/auto_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/idle_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/notifiers/inventory_notifier.dart';
 import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifier.dart';
 
+/// The machine is currently returning coins
 class ReturnCoinsState extends AutoState {
+  /// The machine is currently returning coins
   ReturnCoinsState({
     required super.credit,
     super.displayMessage = 'Rückgabe...',
@@ -13,11 +14,6 @@ class ReturnCoinsState extends AutoState {
 
   @override
   VendingState onFinished() => IdleState();
-
-  @override
-  void updateInventory(InventoryNotifier inventory) {
-    inventory.dispenseChange(credit);
-  }
 
   @override
   void updateNotifier(SnackMachineNotifier notifier) {

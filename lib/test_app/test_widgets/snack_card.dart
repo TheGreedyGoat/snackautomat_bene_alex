@@ -1,16 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:my_utils/utility/money_converter.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
+///
 class SnackSlotCard extends ConsumerStatefulWidget {
+  ///
   const SnackSlotCard({
     required this.snackIndex,
     required this.dimension,
     super.key,
   });
+
+  ///
   final int snackIndex;
+
+  ///
   final double dimension;
 
   @override

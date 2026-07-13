@@ -2,9 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_card.dart';
 
+///
 class SnackDispense extends ConsumerWidget {
+  ///
   const SnackDispense({super.key});
 
   @override

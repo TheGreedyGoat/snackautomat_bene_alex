@@ -3,7 +3,9 @@ import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_st
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
+/// the default state, the machine is currently resting
 class IdleState extends ManualState {
+  /// the default state, the machine is currently resting
   IdleState({super.displayMessage = 'Willkommen!', super.hasError})
     : super(credit: 0, selectedSlot: null);
 

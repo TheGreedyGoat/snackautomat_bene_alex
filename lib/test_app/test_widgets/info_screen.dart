@@ -74,7 +74,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _text(
-                        'Preis: ${selectedSlot?.price ?? '--,-'}',
+                        'Preis: ${selectedSlot?.snackPrice ?? '--,-'}',
                       ),
                       _text(
                         'Kredit: ${state.vendingState.creditDisplay}',

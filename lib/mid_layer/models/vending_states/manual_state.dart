@@ -3,7 +3,9 @@ import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/id
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/pay_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
 
+/// abstract class for VendingStates that wmainly wait for a user input (Insert a coin, press return etc.)
 abstract class ManualState extends VendingState {
+  /// abstract class for VendingStates that wmainly wait for a user input (Insert a coin, press return etc.)
   ManualState({
     required super.credit,
     required super.displayMessage,
@@ -13,7 +15,7 @@ abstract class ManualState extends VendingState {
 
   @override
   VendingState onReturnPressed() {
-    return ReturnCoinsState(credit: credit);
+    return credit > 0 ? ReturnCoinsState(credit: credit) : IdleState();
   }
 
   @override
