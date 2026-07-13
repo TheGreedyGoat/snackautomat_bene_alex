@@ -1,20 +1,3 @@
-import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/test_app/temp_test_app.dart';
 
-void main() {
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
-}
+void main() => runTestApp();

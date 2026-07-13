@@ -1,0 +1,45 @@
+classDiagram
+    class VendingStateNotifier{
+            +VendingState state
+            +void onSnackSelected()
+            +void onCoinInserted()
+            +void onReturnPressed()
+    }
+    class VendingState{
+        <<abstract>>
+            + int credit
+            + Snack? selectedSnack
+            +VendingState onSnackSelected()
+            +VendingState onCoinInserted()
+            +VendingState onReturnPressed()
+        }
+
+    class SnackMachineInventory{
+        
+        - List~Snack~ snacks
+        - CoinStack coinStorage
+    }
+    class SnackMachineInventoryNotifier{
+    }
+
+    class ManualState{}
+    class AutoState{}
+        
+    class IdleState{}
+    class NoSelectionState{}
+    class NoCoinsState{}
+
+    class SnackDispenseState{}
+    class ReturnCoinsState{}
+
+VendingState <|-- ManualState
+VendingState <|-- AutoState
+
+ManualState <|-- IdleState
+ManualState <|-- NoSelectionState
+ManualState <|-- NoCoinsState
+
+AutoState <|-- SnackDispenseState
+AutoState <|-- ReturnCoinsState
+
+VendingStateNotifier "1" o-- "1" VendingState : manages

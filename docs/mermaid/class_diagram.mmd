@@ -1,0 +1,62 @@
+---
+title: Klassendiagramm
+---
+classDiagram
+    class SnackMachineInventory{
+        - List~Snack~ snacks
+        - CoinStack coinStorage
+    }
+    class SnackSlot{
+        + Snack Snack
+        + int amount
+        + reduce()
+    }
+
+    class Snack{
+        + String name
+        + int price
+    }
+    
+    class CoinStack{
+        -Map<Coin, int> _coins
+        +int get sum
+        +void addCoin(Coin)
+        +void removeCoin(Coin)
+        +int getCoinAmount(Coin type)
+        +bool hasCoinOfType(Coin coinType)
+        +Coin? tryGetHighestCoinBelowAmount(int amount)
+        +void clear()
+        +void setRandom()
+        +void setStack(Map<Coin, int> newStack)
+    }
+    class Coin{
+        <<enumeration>>
+        euro2
+        euro1
+        cent50
+        cent20
+        cent10
+        cent5
+        cent2
+        cent1
+        
+        +int worth
+    }
+    class VendingState{
+        <<abstract>>
+            +VendingState onSnackSelected()
+            +VendingState onCoinInserted()
+            +VendingState onReturnPressed()
+        }
+        
+    class IdleState{
+    }
+    class NoSelectionState{}
+
+SnackMachineInventory "1" o-- "1..*" SnackSlot: has
+SnackMachineInventory "1" o-- "1" CoinStack: contains
+SnackMachineInventory "1" o-- "1" VendingState: has
+CoinStack "1" *-- "0..n" Coin: consits of
+SnackSlot "1" o-- "0..*" Snack: cointains
+VendingState <|-- IdleState
+VendingState <|-- NoSelectionState

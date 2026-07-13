@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.5.2 Chrome/142.0.7444.265 Electron/39.6.1 Safari/537.36" version="29.5.2">
   <diagram name="Seite-1" id="oTTafunqd_dl7NHGyMfK">
-    <mxGraphModel dx="3178" dy="1848" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2175" dy="1264" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -214,7 +214,7 @@
         <mxCell id="1N0c4qWG9TdR4CUiiMGS-41" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" value="Manual State&lt;div&gt;(reacts to input)&lt;/div&gt;" vertex="1">
           <mxGeometry height="140" width="140" x="150" y="10" as="geometry" />
         </mxCell>
-        <mxCell id="1N0c4qWG9TdR4CUiiMGS-42" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" value="Auto State&amp;nbsp;&lt;div&gt;(Ignores Input, onbly changes with certain event)&lt;/div&gt;" vertex="1">
+        <mxCell id="1N0c4qWG9TdR4CUiiMGS-42" parent="1" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;" value="Auto State&amp;nbsp;&lt;div&gt;(Ignores Input, only changes with certain event)&lt;/div&gt;" vertex="1">
           <mxGeometry height="127" width="127" x="3" y="10" as="geometry" />
         </mxCell>
         <mxCell id="1N0c4qWG9TdR4CUiiMGS-46" edge="1" parent="1" source="1N0c4qWG9TdR4CUiiMGS-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="RhQ8_gswPIjN4ENhIs4--96">

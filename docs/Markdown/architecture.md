@@ -36,36 +36,6 @@ Aufteilung in 3 Hauptlayer:
   - main.dart
 
 
-# User Interface
-
-<img src="../pics/Snackautomat UI.png" width="600">
-
-- Snackraster
-  - Matrix mit Slots für die Einzelnen Snacks
-  - In jedem Slot passt ein Stapel von Snacks, bei Ausgabe Fallanimation
-  - Preisschild für Snack
-  - Nummer von Snack für Bedienfeld
-- Bedienfeld
-  - Nummernblock zur Auswahl der Snacknummer
-  - Abbrechen Knopf
-  - Knopf zum bestätigen
-  - Kleiner Screen mit Infos wie aktuellem Geldtand und Ausgaben für Admin
-- Geldeingabe
-  - Schlitz für Scheine
-  - Schlitz für Münzen
-  - Geld zurück Knopf
-  - Ausgabefach für Geldrückgabe    
-- Ausgabefach für Snacks
-
-# Datenbank
-Datenbank speichert folgende Dinge:
-- Anzahl der Snacks pro Slot
-- Preis der Snacks
-- Alle Transaktionen
-- Wie viel Geld in dem Automaten ist auch jeweils wie viele Münzen oder Scheine
-
-
-
 
 # Prinzipieller Dataflow:
 (So in etwa)
@@ -84,7 +54,19 @@ User drückt Taste für Snack 'Nuka Cola'
 => ML updated den State des Automaten-Displays
 => Display zeigt an: 'Gewähltes Produkt: Nuka Cola (verfügbar), Preis: € 3,50'
 
-
-# States des Automaten:
-
-<img src="../pics/StateMaschine.png" width="800">
+# State Management
+- Unterscheidung zwischen persistenten und runtime-States
+- ### Runtime:
+  - Im allgemeinen der 'Bedienungs'- State des Automaten
+    - Aktueller Bezahlstand
+    - Ausgewählter Snack
+    - Beziehungen zwischen States über den virtuellen Input des Automaten
+      - Snack wählen
+      - Münzeinwurf
+      - Rückgabeknopf
+      - (ggf Automat schütteln?)
+- ### Persistent
+  - Überwiegend der State des Automaten-Inventars
+    - Wie viele von welchen Snacks sind gerade vorrätig?
+    - Wie viele von welchen Münzen sind gerade vorrätig?
+      - Umfasst nur die Münzen, die tatsächlich gerade im Tresor des Automaten liegen, nicht die, die gerade erst eingeworfen wurden
