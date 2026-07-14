@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'models/snack.dart';
 import 'widgets/snack_stack.dart';
+import 'widgets/vending_display.dart';
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -44,21 +45,23 @@ class MainApp extends StatelessWidget {
           child: SizedBox(
             width: 1000,
             height: 900,
-            child: GridView.builder(
-              padding: const EdgeInsets.all(24),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 24,
-                mainAxisSpacing: 24,
-                childAspectRatio: 0.8,
+            child: VendingDisplay(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(24),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: 16,
+                itemBuilder: (_, index) {
+                  return SnackStack(
+                    snack: snacks[index % snacks.length],
+                    count: 10,
+                  );
+                },
               ),
-              itemCount: 16,
-              itemBuilder: (_, index) {
-                return SnackStack(
-                  snack: snacks[index % snacks.length],
-                  count: 10,
-                );
-              },
             ),
           ),
         ),
