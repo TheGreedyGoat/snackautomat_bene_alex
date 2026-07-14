@@ -24,6 +24,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/
     - assets/images/nuka_cola_sign/
   fonts:
     - family: FixedSys

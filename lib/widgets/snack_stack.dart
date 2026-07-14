@@ -1,0 +1,223 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+
+import '../models/snack.dart';
+import 'snack_card.dart';
+
+class SnackStack extends StatefulWidget {
+  final Snack snack;
+  final int count;
+  final VoidCallback? onTap;
+
+  const SnackStack({
+    super.key,
+    required this.snack,
+    required this.count,
+    this.onTap,
+  });
+
+  @override
+  State<SnackStack> createState() => _SnackStackState();
+}
+
+class _SnackStackState extends State<SnackStack>
+    with SingleTickerProviderStateMixin {
+  late int snackCount;
+
+  late AnimationController controller;
+
+  late Animation<double> fall;
+  late Animation<double> rotation;
+  late Animation<double> rotationX;
+  late Animation<double> rotationY;
+  late Animation<double> drift;
+  late Animation<double> scale;
+
+  final Random random = Random();
+
+  bool removing = false;
+
+  final GlobalKey stackKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+
+    snackCount = widget.count;
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant SnackStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.count != widget.count && !removing) {
+      snackCount = widget.count;
+    }
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void removeSnack() {
+    if (snackCount == 0 || removing) return;
+
+    final box = stackKey.currentContext!.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(context);
+    final overlayBox = overlay.context.findRenderObject() as RenderBox;
+    final globalPosition = box.localToGlobal(Offset.zero);
+    final position = overlayBox.globalToLocal(globalPosition);
+    final renderedRight = box.localToGlobal(Offset(box.size.width, 0)).dx;
+    final widgetScale = (renderedRight - globalPosition.dx) / box.size.width;
+
+    fall = Tween(
+      begin: 0.0,
+      end: overlayBox.size.height - position.dy + 250 * widgetScale,
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInCubic,
+      ),
+    );
+
+    rotation = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * .8 + .3) * (random.nextBool() ? 1 : -1),
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    rotationX = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * 1.2 + .8) * (random.nextBool() ? 1 : -1),
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    rotationY = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * .5 + .15) * (random.nextBool() ? 1 : -1),
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    drift = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * 140 - 70) * widgetScale,
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    scale = Tween(
+      begin: 1.0,
+      end: .92,
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeOut,
+      ),
+    );
+
+    setState(() {
+      removing = true;
+    });
+
+    final entry = OverlayEntry(
+      builder: (_) {
+        return AnimatedBuilder(
+          animation: controller,
+          child: SnackCard(
+            snack: widget.snack,
+            index: 0,
+          ),
+          builder: (_, child) {
+            return Positioned(
+              left: position.dx + drift.value,
+              top: position.dy + fall.value,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0012)
+                  ..rotateX(rotationX.value)
+                  ..rotateY(rotationY.value)
+                  ..rotateZ(rotation.value),
+                child: Transform.scale(
+                  alignment: Alignment.topLeft,
+                  scale: scale.value * widgetScale,
+                  child: child,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    overlay.insert(entry);
+
+    controller.forward().then((_) {
+      entry.remove();
+      if (!mounted) return;
+      setState(() {
+        snackCount--;
+        removing = false;
+      });
+
+      controller.reset();
+    });
+  }
+
+  void handleTap() {
+    widget.onTap?.call();
+    removeSnack();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: handleTap,
+      child: SizedBox(
+        key: stackKey,
+        width: 220,
+        height: 280,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (int i = snackCount - 1; i >= 0; i--)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+                top: i * -6.3,
+                left: i * 2,
+                child: Opacity(
+                  opacity: (i == 0 && removing) ? 0 : 1,
+                  child: SnackCard(
+                    snack: widget.snack,
+                    index: i,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
