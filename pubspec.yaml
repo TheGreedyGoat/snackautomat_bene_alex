@@ -1,25 +1,32 @@
-name: vending_machine_demo
-description: Snack Vending Machine Demo
-
+name: snackautomat_bene_alex
+description: "A new Flutter project."
 publish_to: "none"
-
-version: 1.0.0+1
+version: 0.1.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.12.2
 
 dependencies:
+  build_runner: ^2.15.1
   flutter:
     sdk: flutter
-
+  flutter_riverpod: ^3.3.2
+  freezed: ^3.2.5
+  freezed_annotation: ^3.1.0
+  my_utils:
+    git: https://github.com/TheGreedyGoat/my_utils.git
+  uuid: ^4.5.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/images/
+    - assets/images/nuka_cola_sign/
+  fonts:
+    - family: FixedSys
+      fonts:
+        - asset: assets/images/nuka_cola_sign/fonts/FSEX300.ttf
