@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'snack_slot.dart';
+part of 'snack.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -12,40 +12,40 @@ part of 'snack_slot.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
-mixin _$SnackSlot {
+mixin _$Snack {
 
- SnackTMP get snack; int get amount;
-/// Create a copy of SnackSlot
+ String get name; int get price; String get image;
+/// Create a copy of Snack
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$SnackSlotCopyWith<SnackSlot> get copyWith => _$SnackSlotCopyWithImpl<SnackSlot>(this as SnackSlot, _$identity);
+$SnackCopyWith<Snack> get copyWith => _$SnackCopyWithImpl<Snack>(this as Snack, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SnackSlot&&(identical(other.snack, snack) || other.snack == snack)&&(identical(other.amount, amount) || other.amount == amount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Snack&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.image, image) || other.image == image));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,snack,amount);
+int get hashCode => Object.hash(runtimeType,name,price,image);
 
 @override
 String toString() {
-  return 'SnackSlot(snack: $snack, amount: $amount)';
+  return 'Snack(name: $name, price: $price, image: $image)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SnackSlotCopyWith<$Res>  {
-  factory $SnackSlotCopyWith(SnackSlot value, $Res Function(SnackSlot) _then) = _$SnackSlotCopyWithImpl;
+abstract mixin class $SnackCopyWith<$Res>  {
+  factory $SnackCopyWith(Snack value, $Res Function(Snack) _then) = _$SnackCopyWithImpl;
 @useResult
 $Res call({
- SnackTMP snack, int amount
+ String name, int price, String image
 });
 
 
@@ -53,28 +53,29 @@ $Res call({
 
 }
 /// @nodoc
-class _$SnackSlotCopyWithImpl<$Res>
-    implements $SnackSlotCopyWith<$Res> {
-  _$SnackSlotCopyWithImpl(this._self, this._then);
+class _$SnackCopyWithImpl<$Res>
+    implements $SnackCopyWith<$Res> {
+  _$SnackCopyWithImpl(this._self, this._then);
 
-  final SnackSlot _self;
-  final $Res Function(SnackSlot) _then;
+  final Snack _self;
+  final $Res Function(Snack) _then;
 
-/// Create a copy of SnackSlot
+/// Create a copy of Snack
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? snack = null,Object? amount = null,}) {
-  return _then(SnackSlot(
-snack: null == snack ? _self.snack : snack // ignore: cast_nullable_to_non_nullable
-as SnackTMP,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as int,
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? price = null,Object? image = null,}) {
+  return _then(Snack(
+name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as int,image: null == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [SnackSlot].
-extension SnackSlotPatterns on SnackSlot {
+/// Adds pattern-matching-related methods to [Snack].
+extension SnackPatterns on Snack {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:

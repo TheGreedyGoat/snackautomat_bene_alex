@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
 ///
 class SnackDispense extends ConsumerWidget {
@@ -12,7 +12,7 @@ class SnackDispense extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(snackMachineProvider);
 
-    late final SnackTMP? snack = state.ejectedSnack;
+    late final Snack? snack = state.ejectedSnack;
     return GestureDetector(
       onTap: () {
         ref.read(snackMachineProvider.notifier).emptyDispenseSlot();

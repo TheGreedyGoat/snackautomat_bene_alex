@@ -61,7 +61,7 @@ class _SnackCardState extends ConsumerState<SnackSlotCard> {
                     snackSlot?.priceDisplay ?? '-,--',
                   ),
                   Text(
-                    snackSlot?.amount.toString() ?? '--',
+                    snackSlot?.count.toString() ?? '--',
                   ),
                 ],
               ),
