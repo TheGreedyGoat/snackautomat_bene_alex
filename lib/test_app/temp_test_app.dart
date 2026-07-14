@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_dispense.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_purse.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/info_screen.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/nuka_cola_sign.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_dispense.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_view.dart';
+import 'package:snackautomat_bene_alex/widgets/coin_dispense.dart';
+import 'package:snackautomat_bene_alex/widgets/coin_purse.dart';
+import 'package:snackautomat_bene_alex/widgets/control_pad.dart';
+import 'package:snackautomat_bene_alex/widgets/info_screen.dart';
+import 'package:snackautomat_bene_alex/widgets/nuka_cola_sign.dart';
+import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_dispense.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_view.dart';
 
 void runTestApp() {
   runApp(
@@ -45,9 +46,10 @@ class MainLayout extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: Card(
-                margin: const EdgeInsets.all(0),
-                color: Colors.red,
+              child: DecoratedBox(
+                decoration: getRustyDecoration(Colors.grey).copyWith(
+                  color: const Color.fromARGB(255, 134, 11, 2),
+                ),
                 child: Column(
                   children: [
                     Row(

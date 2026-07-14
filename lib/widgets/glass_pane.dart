@@ -64,7 +64,7 @@ class GlassPane extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               image: DecorationImage(
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
                 image: AssetImage('assets/images/dust.png'),
               ),
             ),
