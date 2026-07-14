@@ -1,56 +1,79 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_card.dart';
+import 'package:snackautomat_bene_alex/models/snack.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_stack.dart';
+import 'package:snackautomat_bene_alex/widgets/vending_display.dart';
 
 class SnackView extends ConsumerWidget {
   const SnackView({required this.width, required this.height, super.key});
   final double width;
   final double height;
-  final double spacing = 16.0;
-  static const dimension = 250.0;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return VendingDisplay(
+      child: Overlay(
+        initialEntries: [
+          OverlayEntry(
+            builder: (_) => const _SnackGrid(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SnackGrid extends ConsumerWidget {
+  const _SnackGrid();
+
+  static const _snackImages = [
+    'assets/images/Twix.png',
+    'assets/images/Rafaelo.png',
+    'assets/images/Pringles.png',
+    'assets/images/MilkaOreo.png',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(snackMachineProvider);
-    return showSnacks(state.snackStorage.length);
-  }
+    final slots = state.snackStorage;
 
-  Widget showSnacks(int numSnacks) {
-    final columns = max((width / (dimension + spacing / 2)).floor(), 1);
-    return ListView.builder(
-      itemCount: (numSnacks / columns).ceil(),
-      itemBuilder: (context, i) {
-        return Column(
-          children: [
-            SizedBox(
-              height: spacing,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              spacing: spacing,
-              children: [
-                for (int j = 0; j < columns; j++)
-                  if (_index(i, j, columns) < numSnacks)
-                    SnackSlotCard(
-                      snackIndex: _index(i, j, columns),
-                      dimension: dimension,
-                    )
-                  else
-                    SizedBox.square(
-                      dimension: dimension,
-                    ),
-              ],
-            ),
-          ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
+        final spacing = 24 * rasterScale;
+
+        return GridView.builder(
+          padding: EdgeInsets.all(spacing),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
+            childAspectRatio: 0.8,
+          ),
+          itemCount: slots.length,
+          itemBuilder: (context, index) {
+            final slot = slots[index];
+            return FittedBox(
+              fit: BoxFit.contain,
+              child: SnackStack(
+                snack: Snack(
+                  name: slot.snackName,
+                  price: slot.snackPrice / 100,
+                  image: _snackImages[index % _snackImages.length],
+                ),
+                count: slot.amount,
+                onTap: () {
+                  ref
+                      .read(snackMachineProvider.notifier)
+                      .onSlotSelected(index);
+                },
+              ),
+            );
+          },
         );
       },
     );
-  }
-
-  int _index(int i, int j, int columns) {
-    return j + columns * i;
   }
 }

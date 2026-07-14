@@ -8,11 +8,13 @@ import 'snack_card.dart';
 class SnackStack extends StatefulWidget {
   final Snack snack;
   final int count;
+  final VoidCallback? onTap;
 
   const SnackStack({
     super.key,
     required this.snack,
     required this.count,
+    this.onTap,
   });
 
   @override
@@ -27,6 +29,8 @@ class _SnackStackState extends State<SnackStack>
 
   late Animation<double> fall;
   late Animation<double> rotation;
+  late Animation<double> rotationX;
+  late Animation<double> rotationY;
   late Animation<double> drift;
   late Animation<double> scale;
 
@@ -49,6 +53,14 @@ class _SnackStackState extends State<SnackStack>
   }
 
   @override
+  void didUpdateWidget(covariant SnackStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.count != widget.count && !removing) {
+      snackCount = widget.count;
+    }
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -58,14 +70,16 @@ class _SnackStackState extends State<SnackStack>
     if (snackCount == 0 || removing) return;
 
     final box = stackKey.currentContext!.findRenderObject() as RenderBox;
-
-    final position = box.localToGlobal(Offset.zero);
-
-    final screenHeight = MediaQuery.of(context).size.height;
+    final overlay = Overlay.of(context);
+    final overlayBox = overlay.context.findRenderObject() as RenderBox;
+    final globalPosition = box.localToGlobal(Offset.zero);
+    final position = overlayBox.globalToLocal(globalPosition);
+    final renderedRight = box.localToGlobal(Offset(box.size.width, 0)).dx;
+    final widgetScale = (renderedRight - globalPosition.dx) / box.size.width;
 
     fall = Tween(
       begin: 0.0,
-      end: screenHeight - position.dy + 250,
+      end: overlayBox.size.height - position.dy + 250 * widgetScale,
     ).animate(
       CurvedAnimation(
         parent: controller,
@@ -83,9 +97,29 @@ class _SnackStackState extends State<SnackStack>
       ),
     );
 
+    rotationX = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * 1.2 + .8) * (random.nextBool() ? 1 : -1),
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    rotationY = Tween(
+      begin: 0.0,
+      end: (random.nextDouble() * .5 + .15) * (random.nextBool() ? 1 : -1),
+    ).animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+
     drift = Tween(
       begin: 0.0,
-      end: random.nextDouble() * 140 - 70,
+      end: (random.nextDouble() * 140 - 70) * widgetScale,
     ).animate(
       CurvedAnimation(
         parent: controller,
@@ -107,11 +141,7 @@ class _SnackStackState extends State<SnackStack>
       removing = true;
     });
 
-    final overlay = Overlay.of(context);
-
-    late OverlayEntry entry;
-
-    entry = OverlayEntry(
+    final entry = OverlayEntry(
       builder: (_) {
         return AnimatedBuilder(
           animation: controller,
@@ -121,19 +151,19 @@ class _SnackStackState extends State<SnackStack>
           ),
           builder: (_, child) {
             return Positioned(
-              left: position.dx,
+              left: position.dx + drift.value,
               top: position.dy + fall.value,
-              child: Transform.translate(
-                offset: Offset(
-                  drift.value,
-                  0,
-                ),
-                child: Transform.rotate(
-                  angle: rotation.value,
-                  child: Transform.scale(
-                    scale: scale.value,
-                    child: child,
-                  ),
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0012)
+                  ..rotateX(rotationX.value)
+                  ..rotateY(rotationY.value)
+                  ..rotateZ(rotation.value),
+                child: Transform.scale(
+                  alignment: Alignment.topLeft,
+                  scale: scale.value * widgetScale,
+                  child: child,
                 ),
               ),
             );
@@ -141,12 +171,11 @@ class _SnackStackState extends State<SnackStack>
         );
       },
     );
-
     overlay.insert(entry);
 
     controller.forward().then((_) {
       entry.remove();
-
+      if (!mounted) return;
       setState(() {
         snackCount--;
         removing = false;
@@ -156,10 +185,15 @@ class _SnackStackState extends State<SnackStack>
     });
   }
 
+  void handleTap() {
+    widget.onTap?.call();
+    removeSnack();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: removeSnack,
+      onTap: handleTap,
       child: SizedBox(
         key: stackKey,
         width: 220,

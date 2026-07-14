@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class GlassPane extends StatelessWidget {
@@ -11,23 +9,19 @@ class GlassPane extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 1.1, sigmaY: 1.1),
-              child: const SizedBox.expand(),
-            ),
-          ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withValues(alpha: 0.14),
-                  Colors.white.withValues(alpha: 0.03),
-                  Colors.white.withValues(alpha: 0.09),
+                  Colors.transparent,
+                  Colors.white.withValues(alpha: 0.02),
+                  Colors.white.withValues(alpha: 0.13),
+                  Colors.white.withValues(alpha: 0.025),
+                  Colors.transparent,
                 ],
-                stops: const [0.0, 0.45, 1.0],
+                stops: const [0.0, 0.18, 0.24, 0.31, 1.0],
               ),
             ),
           ),
@@ -37,17 +31,31 @@ class GlassPane extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.white.withValues(alpha: 0.22),
+                  Colors.white.withValues(alpha: 0.12),
+                  Colors.white.withValues(alpha: 0.025),
                   Colors.transparent,
                 ],
-                stops: const [0.0, 0.35],
+                stops: const [0.0, 0.12, 0.38],
+              ),
+            ),
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(-0.85, -0.9),
+                radius: 1.1,
+                colors: [
+                  Colors.white.withValues(alpha: 0.07),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.7],
               ),
             ),
           ),
           DecoratedBox(
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.18),
+                color: Colors.white.withValues(alpha: 0.22),
                 width: 1.5,
               ),
             ),
