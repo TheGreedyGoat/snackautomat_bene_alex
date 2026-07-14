@@ -32,7 +32,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   @override
   SnackMachineState build() => SnackMachineState(
     coinStorage: CoinStack.withCoins(
-      {for (final c in Coin.values) c: 10},
+      {for (final c in Coin.values) c: 0},
     ),
     changeSlot: CoinStack.empty(),
     snackStorage: _exampleSnacks

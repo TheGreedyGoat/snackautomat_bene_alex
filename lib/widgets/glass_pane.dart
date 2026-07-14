@@ -60,6 +60,15 @@ class GlassPane extends StatelessWidget {
               ),
             ),
           ),
+
+          DecoratedBox(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.fitWidth,
+                image: AssetImage('assets/images/dust.png'),
+              ),
+            ),
+          ),
         ],
       ),
     );

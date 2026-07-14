@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
+import 'package:snackautomat_bene_alex/widgets/glass_pane.dart';
 
 class InfoScreen extends ConsumerStatefulWidget {
   const InfoScreen({super.key});
@@ -41,56 +42,61 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
       color: Colors.black,
       child: SizedBox(
         height: 250,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    height: 1,
-                    child: Container(
-                      color: Colors.green,
-                    ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 1,
+                        child: Container(
+                          color: Colors.green,
+                        ),
+                      ),
+                      _text(title, 30),
+                      SizedBox(
+                        height: 1,
+                        child: Container(
+                          color: Colors.green,
+                        ),
+                      ),
+                      // _text(state.vendingState.runtimeType.toString()),
+                    ],
                   ),
-                  _text(title, 30),
-                  SizedBox(
-                    height: 1,
-                    child: Container(
-                      color: Colors.green,
-                    ),
-                  ),
-                  // _text(state.vendingState.runtimeType.toString()),
-                ],
-              ),
 
-              _text(
-                'AUSWAHL: ${selectedSlot?.snackName ?? '---'}',
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
                   _text(
-                    state.vendingState.displayMessage,
-                    null,
-                    state.vendingState.hasError,
+                    'AUSWAHL: ${selectedSlot?.snackName ?? '---'}',
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       _text(
-                        'Preis: ${selectedSlot?.priceDisplay ?? '--,-'}',
+                        state.vendingState.displayMessage,
+                        null,
+                        state.vendingState.hasError,
                       ),
-                      _text(
-                        'Kredit: ${state.vendingState.creditDisplay}',
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _text(
+                            'Preis: ${selectedSlot?.priceDisplay ?? '--,-'}',
+                          ),
+                          _text(
+                            'Kredit: ${state.vendingState.creditDisplay}',
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            GlassPane(),
+          ],
         ),
       ),
     );
