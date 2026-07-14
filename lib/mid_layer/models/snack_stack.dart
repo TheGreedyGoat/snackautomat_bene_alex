@@ -1,22 +1,22 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_utils/utility/money_converter.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-part 'snack_slot.freezed.dart';
+part 'snack_stack.freezed.dart';
 
 /// A slot for the vending machine that contains a certain amountof the same snack.
 @freezed
-class SnackSlot with _$SnackSlot {
+class SnackStack with _$SnackStack {
   @override
   /// The contained snack's type
-  final SnackTMP snack;
+  final Snack snack;
   @override
   /// The number of snacks contained in this slot.
-  final int amount;
+  final int count;
 
   /// A slot for the vending machine that contains a certain amountof the same snack.
 
-  SnackSlot({required this.snack, required this.amount});
+  SnackStack({required this.snack, required this.count});
 
   ///
   String get snackName => snack.name;
@@ -28,7 +28,7 @@ class SnackSlot with _$SnackSlot {
   String get priceDisplay => MoneyConverter.centsToEutoDisplay(snackPrice);
 
   /// returns if the slot is empty
-  bool get isEmpty => amount <= 0;
+  bool get isEmpty => count <= 0;
 
   /// returns if the slot is not empty
   bool get isNotEmpty => !isEmpty;

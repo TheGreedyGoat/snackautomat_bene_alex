@@ -1,28 +1,39 @@
 import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_machine_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/auto_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/automatic/dispense_snack_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/idle_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-const List<SnackTMP> _exampleSnacks = [
-  SnackTMP(name: 'Nuka Cola', price: 250),
-  SnackTMP(name: 'Nuka Cola Quantum', price: 450),
-  SnackTMP(name: 'Rad Away', price: 430),
-  SnackTMP(name: 'Stimpack', price: 630),
-  SnackTMP(name: 'Jet', price: 500),
-  SnackTMP(name: 'Buffout', price: 500),
-  SnackTMP(name: 'Mentats', price: 500),
-  SnackTMP(name: 'Med-x', price: 500),
-  SnackTMP(name: 'Psycho', price: 500),
+//TODO: Switch to Fallout items
+final snacks = [
+  const Snack(
+    name: 'Twix',
+    price: 120,
+    image: 'assets/images/Twix.png',
+  ),
+  const Snack(
+    name: 'Rafaelo',
+    price: 223,
+    image: 'assets/images/Rafaelo.png',
+  ),
+  const Snack(
+    name: 'Pringles',
+    price: 300,
+    image: 'assets/images/Pringles.png',
+  ),
+  const Snack(
+    name: 'Milka Oreo',
+    price: 300,
+    image: 'assets/images/MilkaOreo.png',
+  ),
 ];
 
 /// The core logical unit of the state machine.
@@ -35,9 +46,9 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
       {for (final c in Coin.values) c: 0},
     ),
     changeSlot: CoinStack.empty(),
-    snackStorage: _exampleSnacks
+    snackStorage: snacks
         .map(
-          (e) => SnackSlot(snack: e, amount: 3),
+          (e) => SnackStack(snack: e, count: 3),
         )
         .toList(),
     vendingState: IdleState(),
@@ -202,7 +213,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     if (!state.snackAvailable(index)) return;
     final storage = state.snackStorage.toList();
 
-    storage[index] = slot.copyWith(amount: slot.amount - 1);
+    storage[index] = slot.copyWith(count: slot.count - 1);
     state = state.copyWith(snackStorage: storage, ejectedSnack: slot.snack);
   }
 
@@ -214,8 +225,8 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   }
 
   /// removes the snack thats currently in the ejection slot and returns it.
-  SnackTMP? emptyDispenseSlot() {
-    SnackTMP? snack = state.ejectedSnack;
+  Snack? emptyDispenseSlot() {
+    Snack? snack = state.ejectedSnack;
     state = state.copyWith(ejectedSnack: null);
     return snack;
   }

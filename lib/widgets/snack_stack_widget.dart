@@ -1,27 +1,22 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-
-import '../models/snack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'snack_card.dart';
 
-class SnackStack extends StatefulWidget {
-  final Snack snack;
-  final int count;
+class SnackStackWidget extends StatefulWidget {
   final VoidCallback? onTap;
-
-  const SnackStack({
+  final SnackStack slot;
+  const SnackStackWidget({
     super.key,
-    required this.snack,
-    required this.count,
+    required this.slot,
     this.onTap,
   });
 
   @override
-  State<SnackStack> createState() => _SnackStackState();
+  State<SnackStackWidget> createState() => _SnackStackWidgetState();
 }
 
-class _SnackStackState extends State<SnackStack>
+class _SnackStackWidgetState extends State<SnackStackWidget>
     with SingleTickerProviderStateMixin {
   late int snackCount;
 
@@ -44,7 +39,7 @@ class _SnackStackState extends State<SnackStack>
   void initState() {
     super.initState();
 
-    snackCount = widget.count;
+    snackCount = widget.slot.count;
 
     controller = AnimationController(
       vsync: this,
@@ -53,10 +48,10 @@ class _SnackStackState extends State<SnackStack>
   }
 
   @override
-  void didUpdateWidget(covariant SnackStack oldWidget) {
+  void didUpdateWidget(covariant SnackStackWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.count != widget.count && !removing) {
-      snackCount = widget.count;
+    if (oldWidget.slot.count != widget.slot.count && !removing) {
+      snackCount = widget.slot.count;
     }
   }
 
@@ -77,65 +72,71 @@ class _SnackStackState extends State<SnackStack>
     final renderedRight = box.localToGlobal(Offset(box.size.width, 0)).dx;
     final widgetScale = (renderedRight - globalPosition.dx) / box.size.width;
 
-    fall = Tween(
-      begin: 0.0,
-      end: overlayBox.size.height - position.dy + 250 * widgetScale,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInCubic,
-      ),
-    );
+    fall =
+        Tween(
+          begin: 0.0,
+          end: overlayBox.size.height - position.dy + 250 * widgetScale,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeInCubic,
+          ),
+        );
 
-    rotation = Tween(
-      begin: 0.0,
-      end: (random.nextDouble() * .8 + .3) * (random.nextBool() ? 1 : -1),
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    rotation =
+        Tween(
+          begin: 0.0,
+          end: (random.nextDouble() * .8 + .3) * (random.nextBool() ? 1 : -1),
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeInOut,
+          ),
+        );
 
-    rotationX = Tween(
-      begin: 0.0,
-      end: (random.nextDouble() * 1.2 + .8) * (random.nextBool() ? 1 : -1),
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    rotationX =
+        Tween(
+          begin: 0.0,
+          end: (random.nextDouble() * 1.2 + .8) * (random.nextBool() ? 1 : -1),
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeInOut,
+          ),
+        );
 
-    rotationY = Tween(
-      begin: 0.0,
-      end: (random.nextDouble() * .5 + .15) * (random.nextBool() ? 1 : -1),
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    rotationY =
+        Tween(
+          begin: 0.0,
+          end: (random.nextDouble() * .5 + .15) * (random.nextBool() ? 1 : -1),
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeInOut,
+          ),
+        );
 
-    drift = Tween(
-      begin: 0.0,
-      end: (random.nextDouble() * 140 - 70) * widgetScale,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    drift =
+        Tween(
+          begin: 0.0,
+          end: (random.nextDouble() * 140 - 70) * widgetScale,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeOut,
+          ),
+        );
 
-    scale = Tween(
-      begin: 1.0,
-      end: .92,
-    ).animate(
-      CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    scale =
+        Tween(
+          begin: 1.0,
+          end: .92,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: Curves.easeOut,
+          ),
+        );
 
     setState(() {
       removing = true;
@@ -146,7 +147,7 @@ class _SnackStackState extends State<SnackStack>
         return AnimatedBuilder(
           animation: controller,
           child: SnackCard(
-            snack: widget.snack,
+            snack: widget.slot.snack,
             index: 0,
           ),
           builder: (_, child) {
@@ -210,7 +211,7 @@ class _SnackStackState extends State<SnackStack>
                 child: Opacity(
                   opacity: (i == 0 && removing) ? 0 : 1,
                   child: SnackCard(
-                    snack: widget.snack,
+                    snack: widget.slot.snack,
                     index: i,
                   ),
                 ),

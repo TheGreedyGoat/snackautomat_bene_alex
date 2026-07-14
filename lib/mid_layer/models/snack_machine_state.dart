@@ -1,9 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_slot.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_tmp.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
 part 'snack_machine_state.freezed.dart';
 
@@ -18,10 +18,10 @@ class SnackMachineState with _$SnackMachineState {
   final CoinStack changeSlot;
   @override
   /// The machine's slots wich contain the snacks the user can select
-  final List<SnackSlot> snackStorage;
+  final List<SnackStack> snackStorage;
   @override
   /// The slot where a paid snack is dispensed to
-  final SnackTMP? ejectedSnack;
+  final Snack? ejectedSnack;
   @override
   /// The machine's current vending state
   final VendingState vendingState;
@@ -41,7 +41,7 @@ class SnackMachineState with _$SnackMachineState {
   }
 
   /// Returns the slot with the given index if existing
-  SnackSlot? getSlot(int? index) =>
+  SnackStack? getSlot(int? index) =>
       index == null || index >= snackStorage.length
       ? null
       : snackStorage[index];

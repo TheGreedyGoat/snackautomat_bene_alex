@@ -1,10 +1,8 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/models/snack.dart';
-import 'package:snackautomat_bene_alex/widgets/snack_stack.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_stack_widget.dart';
 import 'package:snackautomat_bene_alex/widgets/vending_display.dart';
 
 class SnackView extends ConsumerWidget {
@@ -30,14 +28,6 @@ class SnackView extends ConsumerWidget {
 
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
-
-  // TODO später noch richtige Fallout Bilder rein machen
-  static const _snackImages = [
-    'assets/images/Twix.png',
-    'assets/images/Rafaelo.png',
-    'assets/images/Pringles.png',
-    'assets/images/MilkaOreo.png',
-  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,14 +82,8 @@ class _SnackGrid extends ConsumerWidget {
             // skaliert den ganzen Snack und nicht nur das Bild
             return FittedBox(
               fit: BoxFit.contain,
-              child: SnackStack(
-                snack: Snack(
-                  name: slot.snackName,
-                  // Cent zu Euro
-                  price: slot.snackPrice / 100,
-                  image: _snackImages[index % _snackImages.length],
-                ),
-                count: slot.amount,
+              child: SnackStackWidget(
+                slot: slot,
                 onTap: () {
                   // Auswahl an die Automatenlogik geben
                   ref.read(snackMachineProvider.notifier).onSlotSelected(index);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:my_utils/utility/money_converter.dart';
 
-import '../models/snack.dart';
+import '../mid_layer/models/snack.dart';
 
 class SnackCard extends StatelessWidget {
   final Snack snack;
@@ -57,7 +58,7 @@ class SnackCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "${snack.price.toStringAsFixed(2)} €",
+                      MoneyConverter.centsToEutoDisplay(snack.price),
                       style: const TextStyle(
                         color: Colors.white,
                       ),
