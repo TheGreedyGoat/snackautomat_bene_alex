@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_dispense.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/coin_purse.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/info_screen.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/nuka_cola_sign.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_dispense.dart';
-import 'package:snackautomat_bene_alex/test_app/test_widgets/snack_view.dart';
+import 'package:snackautomat_bene_alex/widgets/coin_dispense.dart';
+import 'package:snackautomat_bene_alex/widgets/coin_purse.dart';
+import 'package:snackautomat_bene_alex/widgets/control_pad.dart';
+import 'package:snackautomat_bene_alex/widgets/info_screen.dart';
+import 'package:snackautomat_bene_alex/widgets/inventory_overview.dart';
+import 'package:snackautomat_bene_alex/widgets/nuka_cola_sign.dart';
+import 'package:snackautomat_bene_alex/widgets/overlays/rusty_rounded_box.dart';
+import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_dispense.dart';
+import 'package:snackautomat_bene_alex/widgets/snack_view.dart';
 
 void runTestApp() {
   runApp(
@@ -33,34 +36,27 @@ class VendingTestApp extends StatelessWidget {
 class MainLayout extends StatelessWidget {
   const MainLayout({super.key});
 
-  static const _controlPadWidth = 500.0;
-  static const _dispenseHeight = 250.0;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final snackViewWidth = constraints.maxWidth - 24 - _controlPadWidth;
-        final snackViewHeight = constraints.maxHeight - 8 - _dispenseHeight;
         return Column(
           children: [
             Expanded(
-              child: Card(
-                margin: const EdgeInsets.all(0),
-                color: Colors.red,
+              child: RustyRoundedBox(
+                color: Color(0xffBA1724),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Expanded(
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: _controlPadWidth,
-                              ),
-                              child: InfoScreen(),
+                        Expanded(child: InventoryOverview()),
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 500.0,
                             ),
+                            child: InfoScreen(),
                           ),
                         ),
                         SizedBox.square(
@@ -84,10 +80,7 @@ class MainLayout extends StatelessWidget {
                               color: const Color.fromARGB(255, 243, 210, 196),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: SnackView(
-                                  width: snackViewWidth,
-                                  height: snackViewHeight,
-                                ),
+                                child: SnackView(),
                               ),
                             ),
                           ),

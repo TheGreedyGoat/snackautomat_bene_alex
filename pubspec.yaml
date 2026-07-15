@@ -26,6 +26,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/nuka_cola_sign/
+    - assets/images/decoration/
   fonts:
     - family: FixedSys
       fonts:

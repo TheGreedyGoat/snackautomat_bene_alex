@@ -4,12 +4,14 @@ import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'snack_card.dart';
 
 class SnackStackWidget extends StatefulWidget {
-  final VoidCallback? onTap;
-  final SnackStack slot;
+  final SnackStack stack;
+  final bool dispense;
+  final void Function() onAnimationFinished;
   const SnackStackWidget({
     super.key,
-    required this.slot,
-    this.onTap,
+    required this.stack,
+    required this.onAnimationFinished,
+    this.dispense = false,
   });
 
   @override
@@ -39,7 +41,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
   void initState() {
     super.initState();
 
-    snackCount = widget.slot.count;
+    snackCount = widget.stack.count;
 
     controller = AnimationController(
       vsync: this,
@@ -50,8 +52,8 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
   @override
   void didUpdateWidget(covariant SnackStackWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.slot.count != widget.slot.count && !removing) {
-      snackCount = widget.slot.count;
+    if (oldWidget.stack.count != widget.stack.count && !removing) {
+      snackCount = widget.stack.count;
     }
   }
 
@@ -61,7 +63,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
     super.dispose();
   }
 
-  void removeSnack() {
+  Future<void> removeSnack() async {
     if (snackCount == 0 || removing) return;
 
     final box = stackKey.currentContext!.findRenderObject() as RenderBox;
@@ -137,7 +139,6 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
             curve: Curves.easeOut,
           ),
         );
-
     setState(() {
       removing = true;
     });
@@ -147,7 +148,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
         return AnimatedBuilder(
           animation: controller,
           child: SnackCard(
-            snack: widget.slot.snack,
+            snack: widget.stack.snack,
             index: 0,
           ),
           builder: (_, child) {
@@ -174,27 +175,26 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
     );
     overlay.insert(entry);
 
-    controller.forward().then((_) {
-      entry.remove();
-      if (!mounted) return;
-      setState(() {
-        snackCount--;
-        removing = false;
-      });
-
-      controller.reset();
+    await controller.forward();
+    entry.remove();
+    if (!mounted) return;
+    setState(() {
+      // snackCount--;
+      removing = false;
     });
+    widget.onAnimationFinished();
+    controller.reset();
   }
 
-  void handleTap() {
-    widget.onTap?.call();
-    removeSnack();
-  }
+  // void handleTap() {
+  //   widget.onTap?.call();
+  //   removeSnack();
+  // }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: handleTap,
+      //TODO: Remove Gesture Detector when successful
       child: SizedBox(
         key: stackKey,
         width: 220,
@@ -211,7 +211,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                 child: Opacity(
                   opacity: (i == 0 && removing) ? 0 : 1,
                   child: SnackCard(
-                    snack: widget.slot.snack,
+                    snack: widget.stack.snack,
                     index: i,
                   ),
                 ),

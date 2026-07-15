@@ -2,14 +2,15 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_machine_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/snack_machine_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/auto_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/automatic/dispense_snack_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/idle_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual/no_selection_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/manual_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/vending_states/vending_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/auto_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/no_selection_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
 //TODO: Switch to Fallout items
@@ -43,15 +44,15 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   @override
   SnackMachineState build() => SnackMachineState(
     coinStorage: CoinStack.withCoins(
-      {for (final c in Coin.values) c: 0},
+      {for (final c in Coin.values) c: 10},
     ),
     changeSlot: CoinStack.empty(),
     snackStorage: snacks
         .map(
-          (e) => SnackStack(snack: e, count: 3),
+          (e) => SnackStack(snack: e, count: 1),
         )
         .toList(),
-    vendingState: IdleState(),
+    vendingState: IdleState(numberPadState: NumberPadState.init()),
   );
 
   // 8b           d8  88888888888  888b      88  88888888ba,
@@ -110,6 +111,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
         credit: vendingState.credit,
         displayMessage: 'Rückgeld nicht möglich',
         hasError: true,
+        numberPadState: NumberPadState.init(),
       );
     }
   }
@@ -125,6 +127,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
         credit: vendingState.credit,
         displayMessage: 'Fach ist leer, Wählen Sie etwas anderes',
         hasError: true,
+        numberPadState: NumberPadState.init(),
       );
     }
   }
@@ -154,7 +157,40 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
 
   void _reset() {
     tryDispenseChange();
-    vendingState = IdleState();
+    vendingState = IdleState(numberPadState: NumberPadState.init());
+  }
+
+  void _deselectSnack() {
+    vendingState = NoSelectionState(
+      credit: vendingState.credit,
+      numberPadState: NumberPadState.init(),
+    );
+  }
+
+  // 888b      88
+  // 8888b     88
+  // 88 `8b    88
+  // 88  `8b   88  88       88  88,dPYba,,adPYba,
+  // 88   `8b  88  88       88  88P'   "88"    "8a
+  // 88    `8b 88  88       88  88      88      88
+  // 88     `8888  "8a,   ,a88  88      88      88
+  // 88      `888   `"YbbdP'Y8  88      88      88
+  NumberPadState get numberPadState => vendingState.numberPadState;
+  set numberPadState(NumberPadState newState) =>
+      vendingState = vendingState.setNumPadState(newState);
+
+  void inputDigit(int digit) {
+    if (!vendingState.acceptsInput) return;
+    numberPadState = numberPadState.input(digit);
+    int? selection = numberPadState.value;
+    if (selection != null) {
+      onSlotSelected(selection);
+    }
+  }
+
+  void clearNumPad() {
+    _deselectSnack();
+    numberPadState = NumberPadState.init();
   }
 
   // 88  888b      88  8b           d8
@@ -193,7 +229,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     if (success) {
       state = state.copyWith(
         coinStorage: state.coinStorage.copyWithDifference(change.coinsNegative),
-        vendingState: IdleState(),
+        vendingState: IdleState(numberPadState: NumberPadState.init()),
         changeSlot: change,
       );
     }

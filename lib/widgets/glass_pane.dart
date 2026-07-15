@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class GlassPane extends StatelessWidget {
   const GlassPane({super.key});
-
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
@@ -64,7 +63,7 @@ class GlassPane extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               image: DecorationImage(
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
                 image: AssetImage('assets/images/dust.png'),
               ),
             ),
