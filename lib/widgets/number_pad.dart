@@ -64,17 +64,25 @@ class _NumberPadState extends ConsumerState<NumberPad> {
     );
   }
 
-  Widget _button(String label, void Function() onPressed) => DecoratedBox(
-    decoration: BoxDecoration(shape: BoxShape.circle),
-    child: GestureDetector(
-      onTap: onPressed,
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
+  Widget _button(String label, void Function() onPressed) => Rusty(
+    borderRadius: 5.0,
+    color: Colors.blueGrey,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+
+      child: TextButton(
+        onPressed: onPressed,
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white54,
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

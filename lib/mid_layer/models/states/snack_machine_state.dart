@@ -27,14 +27,13 @@ class SnackMachineState with _$SnackMachineState {
   /// The machine's current vending state
   final VendingState vendingState;
 
-  final NumberPadState numberPadState;
+  NumberPadState get numberPadState => vendingState.numberPadState;
 
   /// The overall State of the machine, including inventory and vending state
   SnackMachineState({
     required this.coinStorage,
     required this.changeSlot,
     required this.snackStorage,
-    required this.numberPadState,
     this.ejectedSnack,
     required this.vendingState,
   });

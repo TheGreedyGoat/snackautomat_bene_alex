@@ -1,4 +1,5 @@
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifier.dart';
 
@@ -10,7 +11,7 @@ abstract class AutoState extends VendingState {
     required super.displayMessage,
     super.selectedSlot,
     super.hasError,
-  }) : super(acceptsInput: false);
+  }) : super(acceptsInput: false, numberPadState: NumberPadState.init());
 
   @override
   VendingState onCoinInserted(Coin coin) => this;
@@ -26,4 +27,7 @@ abstract class AutoState extends VendingState {
 
   /// call before onFinished to update the notifier'S information
   void updateNotifier(SnackMachineNotifier notifier);
+
+  @override
+  VendingState setNumPadState(NumberPadState newState) => this;
 }

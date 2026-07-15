@@ -43,6 +43,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
       child: SizedBox(
         height: 250,
         child: Stack(
+          fit: StackFit.expand,
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),

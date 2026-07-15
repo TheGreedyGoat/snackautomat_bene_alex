@@ -4,7 +4,9 @@ import 'package:snackautomat_bene_alex/widgets/coin_dispense.dart';
 import 'package:snackautomat_bene_alex/widgets/coin_purse.dart';
 import 'package:snackautomat_bene_alex/widgets/control_pad.dart';
 import 'package:snackautomat_bene_alex/widgets/info_screen.dart';
+import 'package:snackautomat_bene_alex/widgets/inventory_overview.dart';
 import 'package:snackautomat_bene_alex/widgets/nuka_cola_sign.dart';
+import 'package:snackautomat_bene_alex/widgets/overlays/rusty_rounded_box.dart';
 import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
 import 'package:snackautomat_bene_alex/widgets/snack_dispense.dart';
 import 'package:snackautomat_bene_alex/widgets/snack_view.dart';
@@ -34,35 +36,27 @@ class VendingTestApp extends StatelessWidget {
 class MainLayout extends StatelessWidget {
   const MainLayout({super.key});
 
-  static const _controlPadWidth = 500.0;
-  static const _dispenseHeight = 250.0;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final snackViewWidth = constraints.maxWidth - 24 - _controlPadWidth;
-        final snackViewHeight = constraints.maxHeight - 8 - _dispenseHeight;
         return Column(
           children: [
             Expanded(
-              child: DecoratedBox(
-                decoration: getRustyDecoration(Colors.grey).copyWith(
-                  color: const Color.fromARGB(255, 134, 11, 2),
-                ),
+              child: RustyRoundedBox(
+                color: Color(0xffBA1724),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Expanded(
-                          child: Center(
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: _controlPadWidth,
-                              ),
-                              child: InfoScreen(),
+                        Expanded(child: InventoryOverview()),
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 500.0,
                             ),
+                            child: InfoScreen(),
                           ),
                         ),
                         SizedBox.square(
@@ -86,10 +80,7 @@ class MainLayout extends StatelessWidget {
                               color: const Color.fromARGB(255, 243, 210, 196),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: SnackView(
-                                  width: snackViewWidth,
-                                  height: snackViewHeight,
-                                ),
+                                child: SnackView(),
                               ),
                             ),
                           ),

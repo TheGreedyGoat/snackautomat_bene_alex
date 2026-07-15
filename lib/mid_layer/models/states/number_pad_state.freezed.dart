@@ -32,10 +32,6 @@ bool operator ==(Object other) {
 @override
 int get hashCode => Object.hash(runtimeType,digit0,digit1,digit2);
 
-@override
-String toString() {
-  return 'NumberPadState(digit0: $digit0, digit1: $digit1, digit2: $digit2)';
-}
 
 
 }

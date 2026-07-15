@@ -1,3 +1,4 @@
+import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/return_coins_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/pay_state.dart';
@@ -9,17 +10,24 @@ abstract class ManualState extends VendingState {
   ManualState({
     required super.credit,
     required super.displayMessage,
+    required super.numberPadState,
     super.selectedSlot,
     super.hasError,
   }) : super(acceptsInput: true);
 
   @override
   VendingState onReturnPressed() {
-    return credit > 0 ? ReturnCoinsState(credit: credit) : IdleState();
+    return credit > 0
+        ? ReturnCoinsState(credit: credit)
+        : IdleState(numberPadState: NumberPadState.init());
   }
 
   @override
   VendingState onSnackSelected(int slot) {
-    return PayState(credit: credit, selectedSlot: slot);
+    return PayState(
+      credit: credit,
+      selectedSlot: slot,
+      numberPadState: numberPadState,
+    );
   }
 }

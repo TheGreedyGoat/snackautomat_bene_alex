@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class GlassPane extends StatelessWidget {
   const GlassPane({super.key});
-
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(

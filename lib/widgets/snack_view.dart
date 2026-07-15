@@ -7,9 +7,7 @@ import 'package:snackautomat_bene_alex/widgets/snack_stack_widget.dart';
 import 'package:snackautomat_bene_alex/widgets/vending_display.dart';
 
 class SnackView extends ConsumerWidget {
-  const SnackView({required this.width, required this.height, super.key});
-  final double width;
-  final double height;
+  const SnackView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
