@@ -52,33 +52,27 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                 children: [
                   Column(
                     children: [
-                      SizedBox(
-                        height: 1,
-                        child: Container(
-                          color: Colors.green,
-                        ),
-                      ),
+                      _separationLine,
                       _text(title, 30),
-                      SizedBox(
-                        height: 1,
-                        child: Container(
-                          color: Colors.green,
-                        ),
-                      ),
+                      _separationLine,
                     ],
                   ),
-
                   _text(
-                    'AUSWAHL: ${state.numberPadState}',
+                    state.vendingState.displayMessage,
+                    null,
+                    state.vendingState.hasError,
                   ),
-                  _text('${selectedSlot?.snackName ?? ''}'),
+
                   Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      _text(
-                        state.vendingState.displayMessage,
-                        null,
-                        state.vendingState.hasError,
+                      _separationLine,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _text('AUSWAHL: ${state.numberPadState}', 30),
+                          _text('${selectedSlot?.snackName ?? ''}', 30),
+                        ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -108,6 +102,13 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
     timer.cancel();
     super.dispose();
   }
+
+  Widget get _separationLine => SizedBox(
+    height: 1,
+    child: Container(
+      color: Colors.green,
+    ),
+  );
 
   Text _text(String data, [double? fontSize, bool hasError = false]) => Text(
     data,

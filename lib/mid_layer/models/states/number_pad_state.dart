@@ -10,20 +10,25 @@ class NumberPadState with _$NumberPadState {
   NumberPadState.init() : this();
 
   @override
-  String toString() => '${digit2 ?? '-'}${digit1 ?? '-'}${digit0 ?? '-'}';
+  String toString() {
+    return '${digit2 ?? ''}${digit1 ?? ''}${digit0 ?? ''}'.padLeft(
+      3,
+      '-',
+    );
+  }
 
   NumberPadState input(int digit) {
     if (digit > 9 || digit < 0) {
       throw ('Invalid num pad digit. Only numbers [0,9] allowed!');
     }
-    if (digit0 == null) {
-      return copyWith(digit0: digit);
+    if (digit2 == null) {
+      return copyWith(digit2: digit);
     } else if (digit1 == null) {
       return copyWith(digit1: digit);
-    } else if (digit2 == null) {
-      return copyWith(digit2: digit);
+    } else if (digit0 == null) {
+      return copyWith(digit0: digit);
     } else {
-      return this;
+      return NumberPadState(digit0: digit);
     }
   }
 

@@ -49,7 +49,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     changeSlot: CoinStack.empty(),
     snackStorage: snacks
         .map(
-          (e) => SnackStack(snack: e, count: 13),
+          (e) => SnackStack(snack: e, count: 1),
         )
         .toList(),
     vendingState: IdleState(numberPadState: NumberPadState.init()),
