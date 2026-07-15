@@ -1,38 +1,31 @@
+
 erDiagram
-    VENDING_MACHINE ||--o{ COIN_STACK : "1:2"
-    VENDING_MACHINE ||--o{ SNACK_SLOT : "1:n"
-    VENDING_MACHINE ||--|| VENDING_STATE : "1:1"
+    COIN_STACK ||--o{ COIN_STACK_ENTRY : "1:n"
+    %% VENDING_MACHINE ||--o{ SNACK_SLOT : "1:n"
+    %% VENDING_MACHINE ||--|| VENDING_STATE : "1:1"
     SNACK_SLOT }|--|| SNACK : "n:1"
+    VENDING_STATE }|--|| SNACK_SLOT : "0..1:1"
 
-    VENDING_MACHINE {
-        int id PK "CHECK (id = 1) (Singleton)"
-        int coinStorageID FK "0"
-        int changeID FK "1"
+
+    COIN_STACK_ENTRY {
+        int coin_stack_id FK
+        int coin_type
+        int count 
     }
 
-    COIN_STACK {
-        int id PK
-        json tresorCoins "Map<Coin, int>" 
-        json returnCoins "Map<Coin, int>"
-    }
+    %% VENDING_MACHINE {
+    %%     int id PK "CHECK (id = 1) (Singleton)"
+    %% }
 
     SNACK_SLOT {
-        int id PK
-        int vendingMachineId FK
-        int snackId FK
-        int count
-    }
-
-    SNACK {
-        int id PK
-        string name
-        int priceInCents "In Cent!"
+        int snack_id PK
+        int vending_machine_id FK
+        int count ">= 0"
     }
 
     VENDING_STATE {
         int id PK "CHECK (id = 1) (Singleton)"
-        int vendingMachineId FK
         string type 
-        int selectedSnackId FK
-        int insertedCoinsInCents "In Cent!"
+        int selected_slot_id FK
+        int credit ">= 0"
     }

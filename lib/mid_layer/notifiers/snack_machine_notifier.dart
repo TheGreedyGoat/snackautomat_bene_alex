@@ -70,6 +70,7 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   VendingState get vendingState => state.vendingState;
 
   set vendingState(VendingState newState) {
+    print(newState.runtimeType.toString());
     state = state.copyWith(vendingState: newState);
     _resetTimer?.cancel();
 

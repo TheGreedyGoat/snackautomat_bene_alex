@@ -1,41 +1,16 @@
 erDiagram
-    COIN_TYPE ||--o{ COIN_STACK_ENTRY : "1:n"
-    COIN_STACK ||--o{ COIN_STACK_ENTRY : "1:n"
-    VENDING_MACHINE ||--o{ SNACK_SLOT : "1:n"
-    VENDING_MACHINE ||--|| VENDING_STATE : "1:1"
-    SNACK_SLOT }|--|| SNACK : "n:1"
+    %% VENDING_MACHINE ||--o{ SNACK_SLOT : "1:n"
+    %% VENDING_MACHINE ||--|| VENDING_STATE : "1:1"
     VENDING_STATE }|--|| SNACK_SLOT : "0..1:1"
 
-    COIN_TYPE {
-        int id PK
-        string name 
-        int value_in_cents UK "z. B. 200"
-    }
-
-    COIN_STACK {
-        int id PK 
-    }
 
     COIN_STACK_ENTRY {
-        int coin_stack_id FK
+        int coin_stack_id
         int coin_type
         int count 
     }
-
-    VENDING_MACHINE {
-        int id PK "CHECK (id = 1) (Singleton)"
-    }
-
-    SNACK {
-        int id PK
-        string name
-        int price_in_cents "> 0"
-    }
-
     SNACK_SLOT {
-        int id PK
-        int vending_machine_id FK
-        int snack_id FK
+        int snack_id PK
         int count ">= 0"
     }
 
@@ -44,5 +19,5 @@ erDiagram
         int vending_machine_id FK
         string type 
         int selected_slot_id FK
-        int inserted_coins_in_cents ">= 0"
+        int credit ">= 0"
     }
