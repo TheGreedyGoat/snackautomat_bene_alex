@@ -54,7 +54,7 @@ class CoinStack {
   );
 
   /// Returns how many coins of the specified type are currently contained
-  int getCoinAmount(Coin type) => _coins[type]!;
+  int getCoinCount(Coin type) => _coins[type]!;
 
   /// The total number of all coins contained
   int get totalCoins => coins.values.fold(
@@ -98,7 +98,7 @@ class CoinStack {
   }
 
   ///  returns true if this CoinStack contains at least 1 coin of the type [coinType]
-  bool hasCoinOfType(Coin coinType) => getCoinAmount(coinType) > 0;
+  bool hasCoinOfType(Coin coinType) => getCoinCount(coinType) > 0;
 
   /// copies this CoinStack and adds/ substracts all non null values within [diff] to the copie's coins
   /// ```dart
@@ -154,6 +154,20 @@ class CoinStack {
     }
 
     return null;
+  }
+
+  bool canReturnAmount(int amount) {
+    final storage = fullCopy;
+    while (amount > 0) {
+      Coin? nextToRemove = storage.tryGetHighestCoinBelowAmount(amount);
+      if (nextToRemove == null) {
+        return false;
+      } else {
+        storage.tryRemoveCoin(nextToRemove);
+        amount -= nextToRemove.worth;
+      }
+    }
+    return true;
   }
 
   /// get the total value of all coins

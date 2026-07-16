@@ -5,6 +5,7 @@ import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifier.dart';
 
 part 'snack_machine_state.freezed.dart';
 
@@ -22,7 +23,8 @@ class SnackMachineState with _$SnackMachineState {
   final List<SnackStack> snackStorage;
   @override
   /// The slot where a paid snack is dispensed to
-  final Snack? ejectedSnack;
+  final int? ejectedSnackIndex;
+
   @override
   /// The machine's current vending state
   final VendingState vendingState;
@@ -34,9 +36,15 @@ class SnackMachineState with _$SnackMachineState {
     required this.coinStorage,
     required this.changeSlot,
     required this.snackStorage,
-    this.ejectedSnack,
+    this.ejectedSnackIndex,
     required this.vendingState,
   });
+
+  Snack? get ejectedSnack {
+    return (ejectedSnackIndex != null)
+        ? snacks.elementAtOrNull(ejectedSnackIndex!)
+        : null;
+  }
 
   /// returns a copy of this with one coin of the given [coinType] added
   SnackMachineState insertCoin(Coin coinType) {

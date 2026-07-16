@@ -20,7 +20,7 @@ class NoSelectionState extends ManualState {
     return NoSelectionState(credit: newCredit, numberPadState: numberPadState);
   }
 
-  @override
-  VendingState setNumPadState(NumberPadState newState) =>
-      NoSelectionState(credit: credit, numberPadState: newState);
+  // @override
+  // VendingState setNumPadState(NumberPadState newState) =>
+  //     NoSelectionState(credit: credit, numberPadState: newState);
 }

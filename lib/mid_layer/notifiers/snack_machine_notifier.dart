@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/snack_machine_state.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/auto_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/error_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual_state.dart';
@@ -39,21 +41,42 @@ final snacks = [
 
 /// The core logical unit of the state machine.
 ///
-/// MAnages all the communication about the snack machine's inventory and current vending state
-class SnackMachineNotifier extends Notifier<SnackMachineState> {
+/// Manages all the communication about the snack machine's inventory and current vending state
+class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
+  static const int _coinStorageID = 0;
+  static const int _coinChangeID = 1;
+  DataBaseService get _dbService => DataBaseService.instance;
+
   @override
-  SnackMachineState build() => SnackMachineState(
-    coinStorage: CoinStack.withCoins(
-      {for (final c in Coin.values) c: 10},
-    ),
-    changeSlot: CoinStack.empty(),
-    snackStorage: snacks
-        .map(
-          (e) => SnackStack(snack: e, count: 1),
-        )
-        .toList(),
-    vendingState: IdleState(numberPadState: NumberPadState.init()),
-  );
+  Future<SnackMachineState> build() async {
+    var coinStorage = await _dbService.getCoinStack(_coinStorageID, true);
+    print(coinStorage);
+    var change = await _dbService.getCoinStack(_coinChangeID, true);
+    var snackStorage = await _dbService.getSnackStacks();
+    if (snackStorage.isEmpty) {
+      for (int i = 0; i < snacks.length; i++) {
+        await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));
+      }
+    }
+    var vendingState = await _dbService.vendingState;
+    if (!coinStorage.canReturnAmount(vendingState.credit)) {
+      vendingState = IdleState(numberPadState: NumberPadState.init());
+    }
+    return SnackMachineState(
+      coinStorage: coinStorage,
+      changeSlot: change,
+      snackStorage: snackStorage,
+      vendingState: vendingState,
+    );
+  }
+
+  SnackMachineState? tryFetchState() {
+    SnackMachineState? maybeState;
+    state.whenData(
+      (value) => maybeState = value,
+    );
+    return maybeState!;
+  }
 
   // 8b           d8  88888888888  888b      88  88888888ba,
   // `8b         d8'  88           8888b     88  88      `"8b
@@ -64,50 +87,99 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   //      `888'       88           88     `8888  88      .a8P
   //       `8'        88888888888  88      `888  88888888Y"'
 
+  set coinStorage(CoinStack newStorage) {
+    _dbService
+        .updateCoinstack(newStorage, _coinStorageID)
+        .then(
+          (_) => state = state.whenData(
+            (state) => state.copyWith(coinStorage: newStorage),
+          ),
+        );
+  }
+
+  set changeSlot(CoinStack newStorage) {
+    _dbService
+        .updateCoinstack(newStorage, _coinChangeID)
+        .then(
+          (_) => state = state.whenData(
+            (state) => state.copyWith(changeSlot: newStorage),
+          ),
+        );
+  }
+
   /// A shortcut to the vending-substate.
   ///
   /// Setting this also updates the overall state
-  VendingState get vendingState => state.vendingState;
+  VendingState get vendingState {
+    VendingState? result;
+    int credit = 0;
+    state.whenData(
+      (state) {
+        result = state.vendingState;
+        credit = state.vendingState.credit;
+      },
+    );
+    return result ?? ErrorState(credit: credit, numberPadState: numberPadState);
+  }
 
   set vendingState(VendingState newState) {
-    print(newState.runtimeType.toString());
-    state = state.copyWith(vendingState: newState);
-    _resetTimer?.cancel();
+    _dbService.updateVendingState(newState).then(
+      (_) {
+        state = state.whenData(
+          (value) => value.copyWith(vendingState: newState),
+        );
+        _resetTimer?.cancel();
 
-    if (vendingState is ManualState && vendingState is! IdleState) {
-      _resetTimer = Timer(
-        Duration(seconds: 500),
-        _reset,
-      );
-    } else if (vendingState is AutoState) {
-      Future.delayed(Duration(seconds: 3)).then(
-        (_) => onFinished(),
-      );
-    }
+        if (vendingState is ManualState &&
+            vendingState is! IdleState &&
+            vendingState is! ErrorState) {
+          _resetTimer = Timer(
+            Duration(seconds: 500),
+            _reset,
+          );
+        } else if (vendingState is AutoState) {
+          Future.delayed(Duration(seconds: 3)).then(
+            (_) => onFinished(),
+          );
+        }
+        if (vendingState is ManualState) {
+          _checkPaidAndDispense();
+        }
+      },
+    );
   }
 
-  @override
-  set state(SnackMachineState newState) {
-    super.state = newState;
-  }
-
+  // {
+  //   vending_type: NoSelectionState,
+  //   vending_slot: null,
+  //   vending_credit: 200
+  // }
+  /* 
+  ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: SqfliteFfiException(sqlite_error: 1, , SqliteException(1): while preparing statement, near ",": syntax error, SQL logic error (code 1)
+  Causing statement (at position 103): UPDATE VENDINGSTATES SET vending_type = ?, vending_slot = NULL, vending_credit = ? WHERE vending_id = ?,})
+  */
   Timer? _resetTimer;
 
   void _checkPaidAndDispense() {
     int? snackIndex = vendingState.selectedSlot;
-    int? price = state.getSlot(snackIndex)?.snackPrice;
-    print(' checkPaid\nprice: $price\n credit: ${vendingState.credit}');
-    if (price == null || vendingState.credit < price) return;
+    int? price;
 
+    state.whenData(
+      (value) => price = value.getSlot(snackIndex)?.snackPrice,
+    );
+    if (price == null || vendingState.credit < price!) return;
+    // price != null => snack is selected!
     if (checkForChange(
-          vendingState.credit - price,
+          vendingState.credit - price!,
         ) !=
         null) {
+      // Rückgeld möglich, Ausgabe
       vendingState = DispenseSnackState(
-        credit: vendingState.credit - price,
+        credit: vendingState.credit - price!,
         selectedSlot: vendingState.selectedSlot,
       );
     } else {
+      // Rückgeld nicht möglich, Auswahl aufheben
       vendingState = NoSelectionState(
         credit: vendingState.credit,
         displayMessage: 'Rückgeld nicht möglich',
@@ -117,27 +189,52 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     }
   }
 
+  // 88888888888
+  // 88                                              ,d
+  // 88                                              88
+  // 88aaaaa  8b       d8   ,adPPYba,  8b,dPPYba,  MM88MMM  ,adPPYba,
+  // 88"""""  `8b     d8'  a8P_____88  88P'   `"8a   88     I8[    ""
+  // 88        `8b   d8'   8PP"""""""  88       88   88      `"Y8ba,
+  // 88         `8b,d8'    "8b,   ,aa  88       88   88,    aa    ]8I
+  // 88888888888  "8"       `"Ybbd8"'  88       88   "Y888  `"YbbdP"'
+
   /// call, when the user selects a snack
-  void onSlotSelected(int slot) {
-    if (!vendingState.acceptsInput) return;
-    if (state.snackAvailable(slot)) {
-      vendingState = vendingState.onSnackSelected(slot);
-      _checkPaidAndDispense();
-    } else {
-      vendingState = NoSelectionState(
-        credit: vendingState.credit,
-        displayMessage: 'Fach ist leer, Wählen Sie etwas anderes',
-        hasError: true,
-        numberPadState: NumberPadState.init(),
-      );
-    }
-  }
+  // void onSlotSelected(int slot) {
+  //   if (!vendingState.acceptsInput) return;
+  //   bool? snackAvailable;
+  //   state.whenData(
+  //     (value) => snackAvailable = value.snackAvailable(slot),
+  //   );
+  //   if (snackAvailable == null) {
+  //     return;
+  //   }
+  //   if (snackAvailable!) {
+  //     print('snack is available');
+  //     vendingState = vendingState.onSnackSelected(slot);
+  //     _checkPaidAndDispense();
+  //   } else {
+  //     print('not available');
+  //     vendingState = NoSelectionState(
+  //       credit: vendingState.credit,
+  //       displayMessage: 'Fach ist leer, Wählen Sie etwas anderes',
+  //       hasError: true,
+  //       numberPadState: NumberPadState.init(),
+  //     );
+  //   }
+  // }
 
   /// call, when the user inserts a coin into the machine
   void onCoinInserted(Coin coin) {
     if (!vendingState.acceptsInput) return;
+    //  CoinStack? storage;
     vendingState = vendingState.onCoinInserted(coin);
-    state = state.insertCoin(coin);
+    state = state.whenData(
+      (value) {
+        final newState = value.insertCoin(coin);
+        coinStorage = newState.coinStorage;
+        return newState;
+      },
+    );
     _checkPaidAndDispense();
   }
 
@@ -177,16 +274,17 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   // 88     `8888  "8a,   ,a88  88      88      88
   // 88      `888   `"YbbdP'Y8  88      88      88
   NumberPadState get numberPadState => vendingState.numberPadState;
-  set numberPadState(NumberPadState newState) =>
-      vendingState = vendingState.setNumPadState(newState);
+
+  set numberPadState(NumberPadState newState) {
+    vendingState = vendingState.setNumPadState(newState);
+  }
 
   void inputDigit(int digit) {
     if (!vendingState.acceptsInput) return;
-    numberPadState = numberPadState.input(digit);
-    int? selection = numberPadState.value;
-    if (selection != null) {
-      onSlotSelected(selection);
-    }
+    final currentNumState = numberPadState;
+    final newNumPadState = currentNumState.input(digit);
+
+    vendingState = vendingState.setNumPadState(newNumPadState);
   }
 
   void clearNumPad() {
@@ -206,8 +304,12 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
   ///
   /// and returns the resulting CoinStack if it can
   CoinStack? checkForChange(int amount) {
-    final storage = state.coinStorage.fullCopy;
-    final change = state.changeSlot.fullCopy;
+    final maybeState = tryFetchState();
+    if (maybeState == null) return null;
+
+    final actualState = maybeState;
+    final storage = actualState.coinStorage.fullCopy;
+    final change = actualState.changeSlot.fullCopy;
     while (amount > 0) {
       Coin? nextToRemove = storage.tryGetHighestCoinBelowAmount(amount);
       if (nextToRemove == null) {
@@ -228,43 +330,57 @@ class SnackMachineNotifier extends Notifier<SnackMachineState> {
     final change = checkForChange(vendingState.credit);
     final success = change != null;
     if (success) {
-      state = state.copyWith(
-        coinStorage: state.coinStorage.copyWithDifference(change.coinsNegative),
-        vendingState: IdleState(numberPadState: NumberPadState.init()),
-        changeSlot: change,
-      );
+      state.whenData((value) {
+        coinStorage = value.coinStorage.copyWithDifference(
+          change.coinsNegative,
+        );
+        changeSlot = change;
+        vendingState = IdleState(numberPadState: NumberPadState.init());
+      });
     }
     return success;
   }
 
   /// the machine dispenses the snack at [index]
   void dispenseSnack(int index) {
-    print('dispensing snack $index');
-    var slot = state.getSlot(index);
+    final maybeState = tryFetchState();
+    if (maybeState == null) return;
+
+    var stack = maybeState.getSlot(index);
     assert(
-      slot != null,
+      stack != null,
       'Error while dispensing snack: SnackSlot with index $index not found!',
     );
-    slot = slot!;
+    stack = stack!;
 
-    if (!state.snackAvailable(index)) return;
-    final storage = state.snackStorage.toList();
+    if (!maybeState.snackAvailable(index)) return;
+    final storage = maybeState.snackStorage.toList();
 
-    storage[index] = slot.copyWith(count: slot.count - 1);
-    state = state.copyWith(snackStorage: storage, ejectedSnack: slot.snack);
+    storage[index] = stack.copyWith(count: stack.count - 1);
+    state = AsyncData(
+      maybeState.copyWith(
+        snackStorage: storage,
+        ejectedSnackIndex: stack.snackID,
+      ),
+    );
   }
 
   /// removes all the coins in the change slot and returns it
   CoinStack emptyChange() {
-    CoinStack change = state.changeSlot;
-    state = state.copyWith(changeSlot: CoinStack.empty());
+    final maybeState = tryFetchState();
+    if (maybeState == null) return CoinStack.empty();
+    CoinStack change = maybeState.changeSlot;
+    changeSlot = CoinStack.empty();
     return change;
   }
 
   /// removes the snack thats currently in the ejection slot and returns it.
   Snack? emptyDispenseSlot() {
-    Snack? snack = state.ejectedSnack;
-    state = state.copyWith(ejectedSnack: null);
+    final maybeState = tryFetchState();
+    if (maybeState == null) return null;
+
+    Snack? snack = maybeState.ejectedSnack;
+    state = AsyncData(maybeState.copyWith(ejectedSnackIndex: null));
     return snack;
   }
 

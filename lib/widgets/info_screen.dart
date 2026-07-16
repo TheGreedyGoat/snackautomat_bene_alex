@@ -16,6 +16,9 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   String title = 'NUKA COLA *=* ' * 5;
   @override
   void initState() {
+    if (ref.read(snackMachineProvider).hasError) {
+      title = ' ERROR ===' * 5;
+    }
     super.initState();
     timer = Timer.periodic(
       Duration(milliseconds: 500),
@@ -26,9 +29,9 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   }
 
   void scrollTitle() {
+    final lastChar = title[title.length - 1];
+    title = title.replaceRange(title.length - 1, null, '');
     setState(() {
-      final lastChar = title[title.length - 1];
-      title = title.replaceRange(title.length - 1, null, '');
       title = '$lastChar$title';
     });
   }
@@ -36,66 +39,109 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(snackMachineProvider);
-    final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
 
-    return Card(
-      color: Colors.black,
-      child: SizedBox(
-        height: 250,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      _separationLine,
-                      _text(title, 30),
-                      _separationLine,
-                    ],
-                  ),
-                  _text(
-                    state.vendingState.displayMessage,
-                    null,
-                    state.vendingState.hasError,
-                  ),
-
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      _separationLine,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _text('AUSWAHL: ${state.numberPadState}', 30),
-                          _text('${selectedSlot?.snackName ?? ''}', 30),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _text(
-                            'Preis: ${selectedSlot?.priceDisplay ?? '--,-'}',
-                          ),
-                          _text(
-                            'Kredit: ${state.vendingState.creditDisplay}',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            GlassPane(),
-          ],
+    return state.when(
+      loading: () => _screen(
+        Center(
+          child: _text('loading'),
         ),
       ),
+      error: (error, stackTrace) {
+        print(error);
+        // print(stackTrace);
+        return _screen(
+          Column(
+            children: [
+              _separationLine,
+              _text(title, 30, true),
+              _separationLine,
+              _text(error.toString(), 20, true),
+            ],
+          ),
+        );
+      },
+      data: (state) {
+        final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
+        return _screen(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _separationLine,
+                    _text(title, 30),
+                    _separationLine,
+                    _text(state.vendingState.credit.toString()),
+                  ],
+                ),
+                _text(
+                  state.vendingState.displayMessage,
+                  null,
+                  state.vendingState.hasError,
+                ),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _separationLine,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _text('AUSWAHL: ${state.numberPadState}', 30),
+                        _text('${selectedSlot?.snackName ?? ''}', 30),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _text(
+                          'Preis: ${selectedSlot?.priceDisplay ?? '--,-'}',
+                        ),
+                        _text(
+                          'Kredit: ${state.vendingState.creditDisplay}',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+
+        // Card(
+        //   color: Colors.black,
+        //   child: SizedBox(
+        //     height: 250,
+        //     child: Stack(
+        //       fit: StackFit.expand,
+        //       children: [
+
+        //         GlassPane(),
+        //       ],
+        //     ),
+        //   ),
+        // );
+      },
     );
   }
+
+  Widget _screen(Widget content) => Card(
+    color: Colors.black,
+    child: SizedBox(
+      height: 250,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          content,
+          GlassPane(),
+        ],
+      ),
+    ),
+  );
 
   @override
   void dispose() {

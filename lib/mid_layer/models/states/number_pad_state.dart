@@ -6,7 +6,10 @@ class NumberPadState with _$NumberPadState {
   final int? digit0;
   final int? digit1;
   final int? digit2;
-  NumberPadState({this.digit0, this.digit1, this.digit2});
+  NumberPadState({this.digit0, this.digit1, this.digit2}) {
+    print(this);
+  }
+
   NumberPadState.init() : this();
 
   @override

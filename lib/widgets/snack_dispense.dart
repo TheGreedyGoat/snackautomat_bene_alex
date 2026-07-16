@@ -12,19 +12,27 @@ class SnackDispense extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(snackMachineProvider);
 
-    late final Snack? snack = state.ejectedSnack;
-    return GestureDetector(
-      onTap: () {
-        ref.read(snackMachineProvider.notifier).emptyDispenseSlot();
-      },
-      child: Card(
-        margin: const EdgeInsets.all(16.0),
-        child: SizedBox.expand(
-          child: Center(
-            child: Text(snack?.name ?? '=========='),
-          ),
-        ),
+    return state.when(
+      loading: () => Placeholder(color: Colors.yellow),
+      error: (error, stackTrace) => Placeholder(
+        color: Colors.red,
       ),
+      data: (state) {
+        final snack = state.ejectedSnack;
+        return GestureDetector(
+          onTap: () {
+            ref.read(snackMachineProvider.notifier).emptyDispenseSlot();
+          },
+          child: Card(
+            margin: const EdgeInsets.all(16.0),
+            child: SizedBox.expand(
+              child: Center(
+                child: Text(snack?.name ?? '=========='),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

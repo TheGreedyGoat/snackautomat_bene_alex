@@ -8,44 +8,48 @@ class CoinDispense extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(snackMachineProvider);
-    return GestureDetector(
-      onTap: () {
-        ref.read(snackMachineProvider.notifier).emptyChange();
-      },
-      child: Column(
-        children: [
-          Card.outlined(
-            child: SizedBox.square(
-              dimension: 100,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    for (
-                      int i = 0;
-                      i < min(state.changeSlot.totalCoins, 8);
-                      i++
-                    )
-                      SizedBox(
-                        height: 10,
-                        width: (Random().nextDouble() * 30) + 60,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Random().nextBool()
-                                ? Colors.amber
-                                : Colors.blueGrey,
-                            border: BoxBorder.all(),
+    final stateAs = ref.watch(snackMachineProvider);
+    return stateAs.when(
+      loading: () => Placeholder(),
+      error: (error, stackTrace) => Placeholder(),
+      data: (state) => GestureDetector(
+        onTap: () {
+          ref.read(snackMachineProvider.notifier).emptyChange();
+        },
+        child: Column(
+          children: [
+            Card.outlined(
+              child: SizedBox.square(
+                dimension: 100,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      for (
+                        int i = 0;
+                        i < min(state.changeSlot.totalCoins, 8);
+                        i++
+                      )
+                        SizedBox(
+                          height: 10,
+                          width: (Random().nextDouble() * 30) + 60,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Random().nextBool()
+                                  ? Colors.amber
+                                  : Colors.blueGrey,
+                              border: BoxBorder.all(),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Text('total: ${state.changeSlot.sumDisplay}'),
-        ],
+            Text('total: ${state.changeSlot.sumDisplay}'),
+          ],
+        ),
       ),
     );
   }

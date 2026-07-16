@@ -32,61 +32,71 @@ class _SnackGrid extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // baut neu wenn sich ein Snack ändert
     final state = ref.watch(snackMachineProvider);
-    final slots = state.snackStorage;
     // damit weiß ich wieviel Platz das Raster hat
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Abstände skalieren ein bischen mit
-        final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
-        final spacing = 24 * rasterScale;
+    return state.when(
+      loading: () => Placeholder(color: Colors.yellow),
+      error: (error, stackTrace) => Placeholder(
+        color: Colors.red,
+      ),
+      data: (state) {
+        final slots = state.snackStorage;
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Abstände skalieren ein bischen mit
+            final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
+            final spacing = 24 * rasterScale;
 
-        // beste Anzahl an Spalten suchen
-        final columns = _bestColumnCount(
-          itemCount: slots.length,
-          width: constraints.maxWidth,
-          height: constraints.maxHeight,
-          spacing: spacing,
-        );
-
-        // ceil rundet die Reihen nach oben
-        final rows = (slots.length / columns).ceil();
-
-        final cellWidth = max(
-          1.0,
-          (constraints.maxWidth - 2 * spacing - (columns - 1) * spacing) /
-              columns,
-        );
-
-        final cellHeight = max(
-          1.0,
-          (constraints.maxHeight - 2 * spacing - (rows - 1) * spacing - 1) /
-              rows,
-        );
-
-        final selected = state.vendingState.selectedSlot;
-        return GridView.builder(
-          // sollte alles reinpassen, scrollen ist also aus
-          physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.all(spacing),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            crossAxisSpacing: spacing,
-            mainAxisSpacing: spacing,
-            childAspectRatio: cellWidth / cellHeight,
-          ),
-          itemCount: slots.length,
-          itemBuilder: (context, index) {
-            final slot = slots[index];
-            final stackWidget = SnackStackWidget(
-              stack: slot,
-              dispense:
-                  state.vendingState is DispenseSnackState && selected == index,
-              onAnimationFinished: () =>
-                  ref.read(snackMachineProvider.notifier).dispenseSnack(index),
+            // beste Anzahl an Spalten suchen
+            final columns = _bestColumnCount(
+              itemCount: slots.length,
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
+              spacing: spacing,
             );
 
-            // skaliert den ganzen Snack und nicht nur das Bild
-            return FittedBox(fit: BoxFit.contain, child: stackWidget);
+            // ceil rundet die Reihen nach oben
+            final rows = (slots.length / columns).ceil();
+
+            final cellWidth = max(
+              1.0,
+              (constraints.maxWidth - 2 * spacing - (columns - 1) * spacing) /
+                  columns,
+            );
+
+            final cellHeight = max(
+              1.0,
+              (constraints.maxHeight - 2 * spacing - (rows - 1) * spacing - 1) /
+                  rows,
+            );
+
+            final selected = state.vendingState.selectedSlot;
+            return GridView.builder(
+              // sollte alles reinpassen, scrollen ist also aus
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.all(spacing),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                crossAxisSpacing: spacing,
+                mainAxisSpacing: spacing,
+                childAspectRatio: max(cellWidth / cellHeight, 0.5),
+              ),
+              itemCount: slots.length,
+              itemBuilder: (context, index) {
+                final slot = slots[index];
+                final stackWidget = SnackStackWidget(
+                  stack: slot,
+                  dispense:
+                      state.vendingState is DispenseSnackState &&
+                      selected == index,
+                  onAnimationFinished: () => ref
+                      .read(snackMachineProvider.notifier)
+                      .dispenseSnack(index),
+                );
+
+                // skaliert den ganzen Snack und nicht nur das Bild
+                return FittedBox(fit: BoxFit.contain, child: stackWidget);
+              },
+            );
           },
         );
       },

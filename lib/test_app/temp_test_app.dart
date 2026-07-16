@@ -7,7 +7,6 @@ import 'package:snackautomat_bene_alex/widgets/info_screen.dart';
 import 'package:snackautomat_bene_alex/widgets/inventory_overview.dart';
 import 'package:snackautomat_bene_alex/widgets/nuka_cola_sign.dart';
 import 'package:snackautomat_bene_alex/widgets/overlays/rusty_rounded_box.dart';
-import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
 import 'package:snackautomat_bene_alex/widgets/snack_dispense.dart';
 import 'package:snackautomat_bene_alex/widgets/snack_view.dart';
 
@@ -27,6 +26,7 @@ class VendingTestApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.dark(),
       home: Scaffold(
+        backgroundColor: Colors.transparent,
         body: MainLayout(),
       ),
     );
