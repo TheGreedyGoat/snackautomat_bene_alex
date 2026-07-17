@@ -60,7 +60,7 @@ class MainLayout extends StatelessWidget {
                           ),
                         ),
                         SizedBox.square(
-                          dimension: 250,
+                          dimension: 200,
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.black,
@@ -89,7 +89,7 @@ class MainLayout extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: 250,
+                      height: 200,
                       child: Row(
                         children: [
                           Expanded(child: SnackDispense()),

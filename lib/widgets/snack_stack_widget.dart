@@ -186,14 +186,15 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
     controller.reset();
   }
 
-  // void handleTap() {
-  //   widget.onTap?.call();
-  //   removeSnack();
-  // }
+  void handleTap() {
+    // widget.onTap?.call();
+    removeSnack();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      // onTap: handleTap,
       //TODO: Remove Gesture Detector when successful
       child: SizedBox(
         key: stackKey,

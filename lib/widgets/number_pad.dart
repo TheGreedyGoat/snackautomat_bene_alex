@@ -6,7 +6,6 @@ import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
 
 class NumberPad extends ConsumerStatefulWidget {
   const NumberPad({super.key});
-
   @override
   ConsumerState<NumberPad> createState() => _NumberPadState();
 }
@@ -24,9 +23,9 @@ class _NumberPadState extends ConsumerState<NumberPad> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 300.0,
-      height: 500.0,
+      height: 400.0,
       child: GridView.builder(
-        padding: const EdgeInsets.all(64.0),
+        padding: const EdgeInsets.symmetric(horizontal: 64.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
           mainAxisSpacing: spacing,

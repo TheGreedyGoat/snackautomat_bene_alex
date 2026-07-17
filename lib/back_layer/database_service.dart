@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:path/path.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
@@ -128,6 +130,11 @@ class DataBaseService {
     }
   }
 
+  Future<void> showSnackStacks() async {
+    final db = await database;
+    print(await db.query(_snackStackTableName));
+  }
+
   Future<List<SnackStack>> getSnackStacks() async {
     final db = await database;
     final jsonStacks = await db.query(_snackStackTableName);
@@ -224,6 +231,17 @@ class DataBaseService {
   // `88888P' 88Y888P' `88888P8 `88888P8   dP   `88888P'
   //          88
   //          dP
+  Future<void> updateSnackStack(int stackID, int newCount) async {
+    final db = await database;
+    final map = {_snackStackCountColumnName: max(newCount, 0)};
+    await db.update(
+      _snackStackTableName,
+      map,
+      where: '$_snackStackIDColumnName = ?',
+      whereArgs: [stackID],
+    );
+  }
+
   Future<void> updateVendingState(VendingState newState) async {
     final db = await database;
     final map = <String, dynamic>{

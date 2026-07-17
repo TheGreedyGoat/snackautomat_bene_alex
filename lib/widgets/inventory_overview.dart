@@ -16,6 +16,10 @@ class InventoryOverview extends ConsumerWidget {
       ),
       data: (state) => Column(
         children: [
+          OutlinedButton(
+            onPressed: ref.read(snackMachineProvider.notifier).refillSnacks,
+            child: Text('refill'),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [Container(), Text('Storage'), Text('Change')],

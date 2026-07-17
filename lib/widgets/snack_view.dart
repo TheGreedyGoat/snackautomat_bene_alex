@@ -40,6 +40,7 @@ class _SnackGrid extends ConsumerWidget {
       ),
       data: (state) {
         final slots = state.snackStorage;
+        print('Slots count: ${slots.length}');
         return LayoutBuilder(
           builder: (context, constraints) {
             // Abstände skalieren ein bischen mit

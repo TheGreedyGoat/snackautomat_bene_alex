@@ -16,7 +16,6 @@ erDiagram
 
     VENDING_STATE {
         int id PK "CHECK (id = 1) (Singleton)"
-        int vending_machine_id FK
         string type 
         int selected_slot_id FK
         int credit ">= 0"
