@@ -8,7 +8,8 @@ BoxDecoration _getRustyDecoration(Color? color, [double? borderRadius]) =>
           : null,
       image: DecorationImage(
         repeat: ImageRepeat.repeat,
-        fit: BoxFit.contain,
+        fit: BoxFit.cover,
+        alignment: AlignmentGeometry.centerLeft,
         scale: 0.5,
         image: AssetImage('assets/images/decoration/rusty_overlay.png'),
       ),

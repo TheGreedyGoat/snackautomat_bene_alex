@@ -13,7 +13,7 @@ class NumPadDisplay extends ConsumerWidget {
 
     return LcdDisplay(
       height: 50,
-      width: 100,
+      // width: 100,
       child: Center(
         child: LcdText(
           state.when(

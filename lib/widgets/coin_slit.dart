@@ -8,7 +8,7 @@ class CoinSlit extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: SizedBox.square(
-        dimension: 100,
+        dimension: 70,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
@@ -22,7 +22,7 @@ class CoinSlit extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: SizedBox(
-                    width: 10,
+                    width: 7,
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.black,

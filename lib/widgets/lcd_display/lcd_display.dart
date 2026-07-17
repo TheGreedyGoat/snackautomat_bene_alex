@@ -30,7 +30,9 @@ class LcdDisplay extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           content,
-          GlassPane(),
+          const GlassPane(
+            borderRadius: 10,
+          ),
         ],
       ),
     ),

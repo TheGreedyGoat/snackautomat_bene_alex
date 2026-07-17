@@ -21,36 +21,26 @@ class _NumberPadState extends ConsumerState<NumberPad> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 300.0,
-      height: 400.0,
-      child: GridView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 64.0),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          mainAxisSpacing: spacing,
-          crossAxisSpacing: spacing,
-        ),
-        itemCount: 12,
-        itemBuilder: (BuildContext context, int index) {
-          if (index < 9) {
-            return _numberButton(index + 1);
-          }
-          return switch (index) {
-            9 => _button(
-              'C',
-              () => notifier.clearNumPad(),
-            ),
-            10 => _numberButton(0),
-
-            11 => _button(
-              'R',
-              () => notifier.onReturnPressed(),
-            ),
-            _ => null,
-          };
-        },
+    return GridView(
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        childAspectRatio: 1,
+        crossAxisCount: 3,
+        mainAxisSpacing: spacing,
+        crossAxisSpacing: spacing,
       ),
+      children: [
+        for (int i = 1; i < 10; i++) _numberButton(i),
+        _button(
+          'C',
+          () => notifier.clearNumPad(),
+        ),
+        _numberButton(0),
+        _button(
+          'R',
+          () => notifier.onReturnPressed(),
+        ),
+      ],
     );
   }
 

@@ -20,7 +20,7 @@ class CoinDispense extends ConsumerWidget {
           children: [
             Card.outlined(
               child: SizedBox.square(
-                dimension: 100,
+                dimension: 70,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -47,7 +47,7 @@ class CoinDispense extends ConsumerWidget {
                 ),
               ),
             ),
-            Text('total: ${state.changeSlot.sumDisplay}'),
+            Card(child: Text('total: ${state.changeSlot.sumDisplay}')),
           ],
         ),
       ),

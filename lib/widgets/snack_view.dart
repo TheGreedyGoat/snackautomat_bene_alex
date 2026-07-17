@@ -89,9 +89,8 @@ class _SnackGrid extends ConsumerWidget {
                   dispense:
                       state.vendingState is DispenseSnackState &&
                       selected == index,
-                  onAnimationFinished: () => ref
-                      .read(snackMachineProvider.notifier)
-                      .dispenseSnack(index),
+                  onAnimationFinished: () =>
+                      ref.read(snackMachineProvider.notifier).onFinished(),
                 );
 
                 // skaliert den ganzen Snack und nicht nur das Bild

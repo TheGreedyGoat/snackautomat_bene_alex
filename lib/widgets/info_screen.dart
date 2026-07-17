@@ -16,7 +16,7 @@ class InfoScreen extends ConsumerStatefulWidget {
 }
 
 class _InfoScreenState extends ConsumerState<InfoScreen> {
-  String title = 'NUKA COLA *=* ';
+  String title = 'NUKA COLA CORP *=* ';
   @override
   void initState() {
     if (ref.read(snackMachineProvider).hasError) {

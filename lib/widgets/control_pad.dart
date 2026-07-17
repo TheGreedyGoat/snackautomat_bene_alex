@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/widgets/coin_dispense.dart';
 import 'package:snackautomat_bene_alex/widgets/coin_slit.dart';
 import 'package:snackautomat_bene_alex/widgets/num_pad_display.dart';
 import 'package:snackautomat_bene_alex/widgets/number_pad.dart';
@@ -14,13 +15,65 @@ class ControlPad extends StatelessWidget {
   Widget build(BuildContext context) {
     return RustyRoundedBox(
       color: const Color.fromARGB(255, 228, 210, 187),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
+
+      child: Row(
+        //Main Row
         children: [
-          NumPadDisplay(),
-          Expanded(child: NumberPad()),
+          Expanded(
+            child: SizedBox(
+              width: 150,
+              child: Column(
+                // mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  NumPadDisplay(),
+                  Expanded(child: NumberPad()),
+                ],
+              ),
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [CoinSlit(), CoinDispense()],
+          ),
         ],
+      ),
+    );
+    return RustyRoundedBox(
+      color: const Color.fromARGB(255, 228, 210, 187),
+      child: Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      width: 150,
+                      child: Column(
+                        // mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          NumPadDisplay(),
+                          Expanded(child: NumberPad()),
+                        ],
+                      ),
+                    ),
+                  ),
+                  CoinSlit(),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CoinDispense(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

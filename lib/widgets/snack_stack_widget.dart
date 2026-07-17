@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
+import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 import 'snack_card.dart';
 
 class SnackStackWidget extends StatefulWidget {
@@ -193,33 +195,36 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      // onTap: handleTap,
-      //TODO: Remove Gesture Detector when successful
-      child: SizedBox(
-        key: stackKey,
-        width: 220,
-        height: 280,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            for (int i = snackCount - 1; i >= 0; i--)
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-                top: i * -6.3,
-                left: i * 2,
-                child: Opacity(
-                  opacity: (i == 0 && removing) ? 0 : 1,
-                  child: SnackCard(
-                    snack: widget.stack.snack,
-                    index: i,
+    return Consumer(
+      builder: (context, ref, child) {
+        ref
+            .read(snackMachineProvider.notifier)
+            .setDispenseCallBack(widget.stack.snackID, removeSnack);
+        return SizedBox(
+          key: stackKey,
+          width: 220,
+          height: 280,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              for (int i = snackCount - 1; i >= 0; i--)
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  top: i * -6.3,
+                  left: i * 2,
+                  child: Opacity(
+                    opacity: (i == 0 && removing) ? 0 : 1,
+                    child: SnackCard(
+                      snack: widget.stack.snack,
+                      index: i,
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

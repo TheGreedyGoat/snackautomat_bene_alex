@@ -48,17 +48,9 @@ class MainLayout extends StatelessWidget {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(child: InventoryOverview()),
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxWidth: 500.0,
-                            ),
-                            child: InfoScreen(),
-                          ),
-                        ),
+                        // Expanded(child: InventoryOverview()),
                         SizedBox.square(
                           dimension: 200,
                           child: Container(
@@ -67,6 +59,14 @@ class MainLayout extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: NukaColaSign(),
+                          ),
+                        ),
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 500.0,
+                            ),
+                            child: InfoScreen(),
                           ),
                         ),
                       ],
@@ -84,18 +84,13 @@ class MainLayout extends StatelessWidget {
                               ),
                             ),
                           ),
-                          ControlPad(),
+                          SizedBox(width: 300, child: ControlPad()),
                         ],
                       ),
                     ),
                     SizedBox(
                       height: 200,
-                      child: Row(
-                        children: [
-                          Expanded(child: SnackDispense()),
-                          CoinDispense(),
-                        ],
-                      ),
+                      child: SnackDispense(),
                     ),
                   ],
                 ),

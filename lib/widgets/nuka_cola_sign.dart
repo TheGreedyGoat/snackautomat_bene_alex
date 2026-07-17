@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
 
 class NukaColaSign extends StatefulWidget {
   const NukaColaSign({super.key});
@@ -18,11 +19,14 @@ class _NukaColaSignState extends State<NukaColaSign> {
 
   final Random _random = Random();
 
+  double angleLimit = 0.05;
+  double angleP = 0;
+  double deltaP = 0.0001;
+
   @override
   void initState() {
     super.initState();
-    _bottleBlink();
-    _cBlink();
+    _animate();
   }
 
   @override
@@ -31,17 +35,64 @@ class _NukaColaSignState extends State<NukaColaSign> {
     super.dispose();
   }
 
+  void _animate() {
+    _bottleBlink();
+    _cBlink();
+    _rotate();
+  }
+
+  void _toggleAnimation() {
+    _continueAnimation = !_continueAnimation;
+    _animate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        _getImage('all_off'),
-        _getImage('c_off'),
-        _getImage('main_on'),
-        if (_cOn) _getImage('c_on'),
-        if (_bottleOn) _getImage('bottle_on'),
-      ],
+    return GestureDetector(
+      onTap: () => _toggleAnimation(),
+      child: Transform.rotate(
+        angle: 2 * pi * angleP,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(spreadRadius: 5, blurRadius: 5)],
+          ),
+          child: Rusty(
+            borderRadius: 1000,
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Rusty(
+                color: Colors.black,
+                borderRadius: 1000,
+                child: Stack(
+                  children: [
+                    _getImage('all_off'),
+                    _getImage('c_off'),
+                    _getImage('main_on'),
+                    if (_cOn) _getImage('c_on'),
+                    if (_bottleOn) _getImage('bottle_on'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  void _rotate() async {
+    if (!_continueAnimation) return;
+    await Future.delayed(Duration(milliseconds: 1));
+    setState(() {
+      angleP += deltaP;
+      angleP = angleP.clamp(-angleLimit, angleLimit);
+    });
+    if (angleP.abs() == angleLimit) {
+      deltaP = -deltaP;
+    }
+    _rotate();
   }
 
   Image _getImage(String name) => Image(
@@ -67,7 +118,7 @@ class _NukaColaSignState extends State<NukaColaSign> {
       _cOn = false;
     });
 
-    final int blinks = _random.nextInt(5);
+    final int blinks = _random.nextInt(10) + 1;
     for (int i = 0; i < blinks; i++) {
       await _delay(0, _random.nextInt(150) + 50);
       setState(() {

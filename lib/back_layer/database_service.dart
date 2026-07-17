@@ -14,6 +14,12 @@ import 'package:sqflite/sqflite.dart';
 class DataBaseService {
   static Database? _db;
   static final DataBaseService instance = DataBaseService._();
+  static const Map<String, dynamic> _defaultVendingState = {
+    _vendingStateIDColumnName: 0,
+    _vendingStateTypeColumnName: 'IdleState',
+    _vendingStateSelectedSlotColumnName: null,
+    _vendingStateCreditColumnName: 0,
+  };
 
   static const _dataBaseName = 'vending_machine.db';
 
@@ -22,15 +28,14 @@ class DataBaseService {
   static const _vendingStateTypeColumnName = 'vending_type';
   static const _vendingStateSelectedSlotColumnName = 'vending_slot';
   static const _vendingStateCreditColumnName = 'vending_credit';
-  static const Map<String, dynamic> _defaultVendingState = {
-    _vendingStateIDColumnName: 0,
-    _vendingStateTypeColumnName: 'IdleState',
-    _vendingStateSelectedSlotColumnName: null,
-    _vendingStateCreditColumnName: 0,
-  };
+  static const _digit0ColumnName = 'digit0';
+  static const _digit1ColumnName = 'digit1';
+  static const _digit2ColumnName = 'digit2';
+
   static const _snackStackTableName = 'SNACK_STACKS';
   static const _snackStackIDColumnName = 'snack_id';
   static const _snackStackCountColumnName = 'snack_count';
+
   static const _coinEntryTableName = 'COIN_ENTRIES';
   static const _coinStackIDColumnName = 'coin_stack_id';
   static const _coinEntryTypeColumnName = 'coin_type';
@@ -62,7 +67,10 @@ class DataBaseService {
             $_vendingStateIDColumnName INT PRIMARY KEY CHECK($_vendingStateIDColumnName = 0),
             $_vendingStateTypeColumnName TEXT NOT NULL,
             $_vendingStateSelectedSlotColumnName INT,
-            $_vendingStateCreditColumnName INT NOT NULL CHECK($_vendingStateCreditColumnName >= 0)
+            $_vendingStateCreditColumnName INT NOT NULL CHECK($_vendingStateCreditColumnName >= 0),
+            $_digit0ColumnName INT CHECK($_digit0ColumnName BETWEEN 0 AND 9),
+            $_digit1ColumnName INT CHECK($_digit1ColumnName BETWEEN 0 AND 9),
+            $_digit2ColumnName INT CHECK($_digit2ColumnName BETWEEN 0 AND 9)
           );
           ''');
 
@@ -110,7 +118,11 @@ class DataBaseService {
     final int? selectedSlot = json[_vendingStateSelectedSlotColumnName];
     final int credit = json[_vendingStateCreditColumnName] ?? 0;
     final String? type = json[_vendingStateTypeColumnName];
-    final numberPadState = NumberPadState.init();
+    final numberPadState = NumberPadState(
+      digit0: json[_digit0ColumnName] as int?,
+      digit1: json[_digit1ColumnName] as int?,
+      digit2: json[_digit2ColumnName] as int?,
+    );
     switch (type) {
       case 'ErrorState':
       case 'IdleState':
@@ -244,10 +256,14 @@ class DataBaseService {
 
   Future<void> updateVendingState(VendingState newState) async {
     final db = await database;
+    final numberPadState = newState.numberPadState;
     final map = <String, dynamic>{
       _vendingStateTypeColumnName: newState.runtimeType.toString(),
       _vendingStateSelectedSlotColumnName: newState.selectedSlot,
       _vendingStateCreditColumnName: newState.credit,
+      _digit0ColumnName: numberPadState.digit0,
+      _digit1ColumnName: numberPadState.digit1,
+      _digit2ColumnName: numberPadState.digit2,
     };
     await db.update(
       _vendingStateTableName,

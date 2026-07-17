@@ -49,6 +49,8 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
   static const int _coinChangeID = 1;
   DataBaseService get _dbService => DataBaseService.instance;
 
+  late final List<void Function()?> dispenseAnimationCallbacks;
+
   @override
   Future<SnackMachineState> build() async {
     await _dbService.showSnackStacks();
@@ -61,6 +63,11 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
         await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));
       }
     }
+    dispenseAnimationCallbacks = snackStorage
+        .map(
+          (_) => _defaultAutoTimer,
+        )
+        .toList(growable: false);
     var vendingState = await _dbService.vendingState;
     if (!coinStorage.canReturnAmount(vendingState.credit)) {
       vendingState = IdleState(numberPadState: NumberPadState.init());
@@ -71,6 +78,11 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
       snackStorage: snackStorage,
       vendingState: vendingState,
     );
+  }
+
+  void setDispenseCallBack(int index, void Function() cb) {
+    if (index < 0 || index >= dispenseAnimationCallbacks.length) return;
+    dispenseAnimationCallbacks[index] = cb;
   }
 
   SnackMachineState? tryFetchState() {
@@ -108,6 +120,12 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
             (state) => state.copyWith(changeSlot: newStorage),
           ),
         );
+  }
+
+  void _defaultAutoTimer() {
+    Future.delayed(Duration(seconds: 3)).then(
+      (_) => onFinished(),
+    );
   }
 
   /// A shortcut to the vending-substate.
@@ -153,10 +171,10 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
             Duration(seconds: 5),
             _reset,
           );
-        } else if (vendingState is AutoState) {
-          Future.delayed(Duration(seconds: 3)).then(
-            (_) => onFinished(),
-          );
+        } else if (vendingState is ReturnCoinsState) {
+          _defaultAutoTimer();
+        } else if (vendingState is DispenseSnackState) {
+          dispenseAnimationCallbacks[vendingState.selectedSlot!]?.call();
         }
         if (vendingState is ManualState) {
           _checkPaidAndDispense();
