@@ -18,28 +18,34 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ve
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
 // TODO: Switch to Fallout items
-/// Placeholder snacks
-final snacks = [
-  const Snack(
+/// The available snack types (4 unique ones)
+const _snackTypes = [
+  Snack(
     name: 'Twix',
     price: 120,
     image: 'assets/images/Twix.png',
   ),
-  const Snack(
+  Snack(
     name: 'Rafaelo',
     price: 223,
     image: 'assets/images/Rafaelo.png',
   ),
-  const Snack(
+  Snack(
     name: 'Pringles',
     price: 300,
     image: 'assets/images/Pringles.png',
   ),
-  const Snack(
+  Snack(
     name: 'Milka Oreo',
     price: 300,
     image: 'assets/images/MilkaOreo.png',
   ),
+];
+
+/// Placeholder snacks: 16 slots for the 4x4 grid,
+/// the 4 types just repeat until all slots are filled
+final snacks = [
+  for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
 ];
 
 /// The core logical unit of the state machine.
@@ -59,10 +65,13 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     print(coinStorage);
     var change = (await _dbService.getCoinStack(_coinChangeID, true))!;
     var snackStorage = await _dbService.getSnackStacks();
-    if (snackStorage.isEmpty) {
-      for (int i = 0; i < snacks.length; i++) {
+    // fehlende Slots nachlegen (z.B. wenn die DB noch von einer
+    // Version mit weniger Slots stammt) und danach neu laden
+    if (snackStorage.length < snacks.length) {
+      for (int i = snackStorage.length; i < snacks.length; i++) {
         await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));
       }
+      snackStorage = await _dbService.getSnackStacks();
     }
     _dispenseAnimationCallbacks = snackStorage
         .map(

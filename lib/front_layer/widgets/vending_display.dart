@@ -15,10 +15,6 @@ class VendingDisplay extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFF141414),
-        border: Border.all(
-          color: Colors.black,
-          width: 14,
-        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.25),
