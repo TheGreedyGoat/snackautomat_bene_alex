@@ -157,7 +157,10 @@ class DataBaseService {
   /// Returns a list off all saved SnackStacks
   Future<List<SnackStack>> getSnackStacks() async {
     final db = await _database;
-    final jsonStacks = await db.query(_snackStackTableName);
+    final jsonStacks = await db.query(
+      _snackStackTableName,
+      orderBy: _snackStackIDColumnName,
+    );
     List<SnackStack> stacks = List.empty(growable: true);
     for (final json in jsonStacks) {
       final snackID = json[_snackStackIDColumnName];

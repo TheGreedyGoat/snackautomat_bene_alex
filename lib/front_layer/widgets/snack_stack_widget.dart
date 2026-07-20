@@ -22,6 +22,7 @@ class SnackStackWidget extends StatefulWidget {
 
 class _SnackStackWidgetState extends State<SnackStackWidget>
     with SingleTickerProviderStateMixin {
+  static const double _cardExtent = 188;
   late int snackCount;
 
   late AnimationController controller;
@@ -71,7 +72,10 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
     final box = stackKey.currentContext!.findRenderObject() as RenderBox;
     final overlay = Overlay.of(context);
     final overlayBox = overlay.context.findRenderObject() as RenderBox;
-    final globalPosition = box.localToGlobal(Offset.zero);
+
+    final globalPosition = box.localToGlobal(
+      Offset(0, box.size.height - _cardExtent),
+    );
     final position = overlayBox.globalToLocal(globalPosition);
     final renderedRight = box.localToGlobal(Offset(box.size.width, 0)).dx;
     final widgetScale = (renderedRight - globalPosition.dx) / box.size.width;
@@ -149,7 +153,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       builder: (_) {
         return AnimatedBuilder(
           animation: controller,
-          child: SnackCard(
+          child: ThickSnackCard(
             snack: widget.stack.snack,
             index: 0,
           ),
@@ -202,8 +206,8 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
             .setDispenseCallBack(widget.stack.snackID, removeSnack);
         return SizedBox(
           key: stackKey,
-          width: 220,
-          height: 280,
+          width: 200,
+          height: 216,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -211,7 +215,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                  top: i * -6.3,
+                  bottom: i * 6.3,
                   left: i * 2,
                   child: Opacity(
                     opacity: (i == 0 && removing) ? 0 : 1,

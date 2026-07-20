@@ -28,6 +28,10 @@ class SnackView extends ConsumerWidget {
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
 
+  // festes Raster: immer 4x4 Plätze
+  static const int columns = 4;
+  static const int rows = 4;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // baut neu wenn sich ein Snack ändert
@@ -45,18 +49,7 @@ class _SnackGrid extends ConsumerWidget {
           builder: (context, constraints) {
             // Abstände skalieren ein bischen mit
             final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
-            final spacing = 24 * rasterScale;
-
-            // beste Anzahl an Spalten suchen
-            final columns = _bestColumnCount(
-              itemCount: slots.length,
-              width: constraints.maxWidth,
-              height: constraints.maxHeight,
-              spacing: spacing,
-            );
-
-            // ceil rundet die Reihen nach oben
-            final rows = (slots.length / columns).ceil();
+            final spacing = 10 * rasterScale;
 
             final cellWidth = max(
               1.0,
@@ -81,8 +74,14 @@ class _SnackGrid extends ConsumerWidget {
                 mainAxisSpacing: spacing,
                 childAspectRatio: max(cellWidth / cellHeight, 0.5),
               ),
-              itemCount: slots.length,
+              // immer alle 16 Zellen, auch wenn weniger Snacks da sind
+              itemCount: columns * rows,
               itemBuilder: (context, index) {
+                // leere Plätze bleiben einfach frei
+                if (index >= slots.length) {
+                  return const SizedBox.shrink();
+                }
+
                 final slot = slots[index];
                 final stackWidget = SnackStackWidget(
                   stack: slot,
@@ -101,39 +100,5 @@ class _SnackGrid extends ConsumerWidget {
         );
       },
     );
-  }
-
-  int _bestColumnCount({
-    required int itemCount,
-    required double width,
-    required double height,
-    required double spacing,
-  }) {
-    if (itemCount <= 1) return 1;
-
-    var bestColumns = 1;
-    var bestScale = 0.0;
-
-    // mehr als 6 wird zu klein
-    final maxColumns = min(itemCount, 6);
-
-    // alle Möglichkeiten einmal durch probieren
-    for (var columns = 1; columns <= maxColumns; columns++) {
-      final rows = (itemCount / columns).ceil();
-      final cellWidth =
-          (width - 2 * spacing - (columns - 1) * spacing) / columns;
-      final cellHeight = (height - 2 * spacing - (rows - 1) * spacing) / rows;
-
-      // normale Snackgröße ist 220 x 280
-      final scale = min(cellWidth / 220, cellHeight / 280);
-
-      // die gröste Variante merken
-      if (scale > bestScale) {
-        bestScale = scale;
-        bestColumns = columns;
-      }
-    }
-
-    return bestColumns;
   }
 }
