@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 
+/// an animated Nuka Cola Neon-sign
 class NukaColaSign extends StatefulWidget {
+  /// an animated Nuka Cola Neon-sign
   const NukaColaSign({super.key});
 
   @override
@@ -105,7 +108,7 @@ class _NukaColaSignState extends State<NukaColaSign> {
     setState(() {
       _bottleOn = !_bottleOn;
     });
-    _bottleBlink();
+    unawaited(_bottleBlink());
   }
 
   void _cBlink() async {

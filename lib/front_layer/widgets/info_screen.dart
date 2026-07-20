@@ -1,14 +1,18 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/widgets/glass_pane.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_display.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_text.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_title.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/ldc_separation_line.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_display.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_text.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_title.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_separation_line.dart';
 
+/// the vending machine's main display.
+///
+/// Used to show any relevant information and 'guide the user through the vending process'
 class InfoScreen extends ConsumerStatefulWidget {
+  /// the vending machine's main display.
+  ///
+  /// Used to show any relevant information and 'guide the user through the vending process'
   const InfoScreen({super.key});
 
   @override
@@ -19,6 +23,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   String title = 'NUKA COLA CORP *=* ';
   @override
   void initState() {
+    super.initState();
     if (ref.read(snackMachineProvider).hasError) {
       title = 'ERROR === ';
     }

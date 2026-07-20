@@ -1,17 +1,29 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_text.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/ldc_separation_line.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_text.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_separation_line.dart';
 
+/// Displays the text as a large banner within seperation lines
+///
+/// The text can be displayed either as single or repetitively and scrolling.
 class LcdTitle extends StatefulWidget {
+  /// Displays the text as a large banner within seperation lines
+  ///
+  /// The text can be displayed either as single or repetitively and scrolling.
   const LcdTitle(
     this.data, {
     this.scroll = true,
     this.hasError = false,
     super.key,
   });
+
+  /// The title's content
   final String data;
+
+  /// set to true to make the title scrolling
   final bool scroll;
+
+  /// set to true to change color from green to red
   final bool hasError;
 
   @override
@@ -24,8 +36,10 @@ class _LcdTitleState extends State<LcdTitle> {
   @override
   void initState() {
     super.initState();
-    title = widget.data * 5;
+    title = widget.data;
     if (widget.scroll) {
+      title += ' ';
+      title *= 5;
       _timer = Timer.periodic(
         Duration(milliseconds: 500),
         (timer) {

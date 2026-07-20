@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
+// import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
 import 'package:snackautomat_bene_alex/test_app/temp_test_app.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -8,7 +8,7 @@ void main() async {
     sqfliteFfiInit();
   }
   databaseFactory = databaseFactoryFfi;
-  // await DataBaseService.instance.deletDatabase();
+  // await DataBaseService.instance.removeDatabase();
   // print('deleted');
   runTestApp();
 }

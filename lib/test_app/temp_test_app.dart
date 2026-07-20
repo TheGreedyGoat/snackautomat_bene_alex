@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:snackautomat_bene_alex/widgets/coin_dispense.dart';
-import 'package:snackautomat_bene_alex/widgets/coin_purse.dart';
-import 'package:snackautomat_bene_alex/widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/widgets/info_screen.dart';
-import 'package:snackautomat_bene_alex/widgets/inventory_overview.dart';
-import 'package:snackautomat_bene_alex/widgets/nuka_cola_sign.dart';
-import 'package:snackautomat_bene_alex/widgets/overlays/rusty_rounded_box.dart';
-import 'package:snackautomat_bene_alex/widgets/snack_dispense.dart';
-import 'package:snackautomat_bene_alex/widgets/snack_view.dart';
+import 'package:snackautomat_bene_alex/front_layer/pages/vending_machine_page.dart';
 
 void runTestApp() {
   runApp(
@@ -27,83 +19,8 @@ class VendingTestApp extends StatelessWidget {
       theme: ThemeData.dark(),
       home: Scaffold(
         backgroundColor: Colors.transparent,
-        body: MainLayout(),
+        body: VendingMachinePage(),
       ),
     );
   }
-}
-
-class MainLayout extends StatelessWidget {
-  const MainLayout({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          children: [
-            Expanded(
-              child: RustyRoundedBox(
-                color: Color(0xffBA1724),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Expanded(child: InventoryOverview()),
-                        SizedBox.square(
-                          dimension: 200,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
-                            child: NukaColaSign(),
-                          ),
-                        ),
-                        Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                              maxWidth: 500.0,
-                            ),
-                            child: InfoScreen(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Card(
-                              margin: EdgeInsets.all(4.0),
-                              color: const Color.fromARGB(255, 243, 210, 196),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SnackView(),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 300, child: ControlPad()),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 200,
-                      child: SnackDispense(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 100, child: CoinPurse()),
-          ],
-        );
-      },
-    );
-  }
-
-  // double _getAvailableWidth(BuildContext context){
-  //   MediaQuery.of(context);
-  // }
 }

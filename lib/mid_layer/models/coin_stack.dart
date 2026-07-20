@@ -156,6 +156,7 @@ class CoinStack {
     return null;
   }
 
+  /// returns true, if the CoinStack contains at least 1 combination of coins that add up exactly to [amount]
   bool canReturnAmount(int amount) {
     final storage = fullCopy;
     while (amount > 0) {

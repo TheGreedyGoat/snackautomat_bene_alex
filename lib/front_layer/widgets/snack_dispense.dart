@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-///
+/// The slot where the dispensed snack will be displayed
 class SnackDispense extends ConsumerWidget {
-  ///
+  /// The slot where the dispensed snack will be displayed
   const SnackDispense({super.key});
 
   @override

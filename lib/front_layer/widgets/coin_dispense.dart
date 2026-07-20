@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
+/// The slot where returned coins will show up
 class CoinDispense extends ConsumerWidget {
+  /// The slot where returned coins will show up
   const CoinDispense({super.key});
 
   @override

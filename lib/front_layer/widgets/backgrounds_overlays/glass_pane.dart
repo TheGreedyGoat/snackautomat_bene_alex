@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 
+/// An Overlay to display content behind a glass pabe
 class GlassPane extends StatelessWidget {
-  const GlassPane({this.borderRadius = 0, super.key});
+  /// An Overlay to display content behind a glass pabe
+  const GlassPane({required this.child, this.borderRadius = 0, super.key});
+
+  /// an optional borderRadius
   final double borderRadius;
+
+  /// The widget to put behind the glass
+  final Widget child;
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Stack(
         fit: StackFit.expand,
         children: [
+          child,
           DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(borderRadius),

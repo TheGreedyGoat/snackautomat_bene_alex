@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 
+/// Displays a box with a rusty texture, rounded corners and ahadows to make it seem like a 3D box
 class RustyRoundedBox extends StatelessWidget {
+  /// The content to show on the rusty box
   final Widget? child;
+
+  /// An optional color to layer the rusty texture on top of
   final Color? color;
-  const RustyRoundedBox({this.color, this.child, super.key});
+
+  /// Displays a box with a rusty texture, rounded corners and ahadows to make it seem like a 3D box
+  const RustyRoundedBox({
+    this.color,
+    this.child,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Rusty(
       color: color,
-      borderRadius: 25.0,
+      borderRadius: 25,
       child: DecoratedBox(
         decoration: BoxDecoration(
           image: DecorationImage(
@@ -26,7 +36,7 @@ class RustyRoundedBox extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(25.0),
+          padding: const EdgeInsets.all(25),
           child: child,
         ),
       ),

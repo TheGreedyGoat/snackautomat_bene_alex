@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_utils/utility/money_converter.dart';
 
-import '../mid_layer/models/snack.dart';
+import '../../mid_layer/models/snack.dart';
 
 class SnackCard extends StatelessWidget {
   final Snack snack;

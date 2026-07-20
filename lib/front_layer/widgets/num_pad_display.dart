@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_display.dart';
-import 'package:snackautomat_bene_alex/widgets/lcd_display/lcd_text.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_display.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_text.dart';
 
+/// A small seperate LCD display to show the current input from the number pad
 class NumPadDisplay extends ConsumerWidget {
+  /// A small seperate LCD display to show the current input from the number pad
   const NumPadDisplay({super.key});
 
   @override
@@ -13,7 +15,6 @@ class NumPadDisplay extends ConsumerWidget {
 
     return LcdDisplay(
       height: 50,
-      // width: 100,
       child: Center(
         child: LcdText(
           state.when(

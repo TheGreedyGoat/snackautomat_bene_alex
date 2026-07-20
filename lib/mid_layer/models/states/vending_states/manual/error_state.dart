@@ -3,7 +3,10 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 
+/// State if something within the machine has gone wrong
 class ErrorState extends ManualState {
+  /// State if something within the machine has gone wrong
+
   ErrorState({
     required super.credit,
     required super.numberPadState,

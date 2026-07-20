@@ -184,7 +184,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       // snackCount--;
       removing = false;
     });
-    widget.onAnimationFinished();
+    // widget.onAnimationFinished();
     controller.reset();
   }
 

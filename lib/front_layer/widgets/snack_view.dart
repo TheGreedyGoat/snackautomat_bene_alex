@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/widgets/snack_stack_widget.dart';
-import 'package:snackautomat_bene_alex/widgets/vending_display.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/snack_stack_widget.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/vending_display.dart';
 
 class SnackView extends ConsumerWidget {
   const SnackView({super.key});

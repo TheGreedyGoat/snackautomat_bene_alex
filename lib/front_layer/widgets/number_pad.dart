@@ -1,54 +1,48 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifier.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
-import 'package:snackautomat_bene_alex/widgets/overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 
-class NumberPad extends ConsumerStatefulWidget {
+/// A custom number pad for the customer to select a snack
+///
+/// Includes a return coins button.
+class NumberPad extends ConsumerWidget {
+  /// A custom number pad for the customer to select a snack
+  ///
+  /// Includes a return coins button.
   const NumberPad({super.key});
-  @override
-  ConsumerState<NumberPad> createState() => _NumberPadState();
-}
 
-class _NumberPadState extends ConsumerState<NumberPad> {
-  late final SnackMachineNotifier notifier;
-  static const spacing = 5.0;
+  static const _spacing = 5.0;
   @override
-  void initState() {
-    super.initState();
-    notifier = ref.read(snackMachineProvider.notifier);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GridView(
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         childAspectRatio: 1,
         crossAxisCount: 3,
-        mainAxisSpacing: spacing,
-        crossAxisSpacing: spacing,
+        mainAxisSpacing: _spacing,
+        crossAxisSpacing: _spacing,
       ),
       children: [
-        for (int i = 1; i < 10; i++) _numberButton(i),
+        for (int i = 1; i < 10; i++) _numberButton(i, ref),
         _button(
           'C',
-          () => notifier.clearNumPad(),
+          () => ref.read(snackMachineProvider.notifier).clearNumPad(),
         ),
-        _numberButton(0),
+        _numberButton(0, ref),
         _button(
           'R',
-          () => notifier.onReturnPressed(),
+          () => ref.read(snackMachineProvider.notifier).onReturnPressed(),
         ),
       ],
     );
   }
 
-  Widget _numberButton(int digit) {
+  Widget _numberButton(int digit, WidgetRef ref) {
     return _button(
       digit.toString(),
       () {
-        notifier.inputDigit(digit);
+        ref.read(snackMachineProvider.notifier).inputDigit(digit);
       },
     );
   }

@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:path/path.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
@@ -11,8 +10,13 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ma
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:sqflite/sqflite.dart';
 
+/// Singleton to communicate with the database.
+///
+/// No public constructor -> access via [instance]
 class DataBaseService {
   static Database? _db;
+
+  /// The active instance
   static final DataBaseService instance = DataBaseService._();
   static const Map<String, dynamic> _defaultVendingState = {
     _vendingStateIDColumnName: 0,
@@ -42,19 +46,20 @@ class DataBaseService {
   static const _coinEntryCountColumnName = 'coin_count';
   DataBaseService._();
 
-  Future<Database> get database async {
-    _db ??= await getDataBase();
+  Future<Database> get _database async {
+    _db ??= await _getDataBase();
     // await deleteDatabase(_db!.path);
 
     // _db = await getDataBase();
     return _db!;
   }
 
-  Future<void> deletDatabase() async {
-    await deleteDatabase((await database).path);
+  /// deletes the whole database
+  Future<void> removeDatabase() async {
+    await deleteDatabase((await _database).path);
   }
 
-  Future<Database> getDataBase() async {
+  Future<Database> _getDataBase() async {
     final databaseDirPath = getDatabasesPath();
     final dataBasePath = join(await databaseDirPath, _dataBaseName);
 
@@ -104,8 +109,9 @@ class DataBaseService {
   // `8888P88 `88888P'   dP
   //      .88
   //  d8888P
+  /// loads the currently saved vendingState
   Future<VendingState> get vendingState async {
-    final db = await database;
+    final db = await _database;
     var stateList = await db.query(_vendingStateTableName);
     if (stateList.isEmpty) {
       stateList = [_defaultVendingState];
@@ -142,13 +148,15 @@ class DataBaseService {
     }
   }
 
+  /// prints the whole table of all saved SnackStacks
   Future<void> showSnackStacks() async {
-    final db = await database;
+    final db = await _database;
     print(await db.query(_snackStackTableName));
   }
 
+  /// Returns a list off all saved SnackStacks
   Future<List<SnackStack>> getSnackStacks() async {
-    final db = await database;
+    final db = await _database;
     final jsonStacks = await db.query(_snackStackTableName);
     List<SnackStack> stacks = List.empty(growable: true);
     for (final json in jsonStacks) {
@@ -163,13 +171,17 @@ class DataBaseService {
     return stacks.toList(growable: false);
   }
 
+  /// prints the whole table of all saved CoinStacks
   Future<void> showCoinStacks() async {
-    final db = await database;
+    final db = await _database;
     print(await db.query(_coinEntryTableName));
   }
 
-  Future<CoinStack> getCoinStack(int coinStackID, bool createOnMissing) async {
-    final db = await database;
+  /// Returns the coinstack with the given [coinStackID] if it exists
+  ///
+  /// if not entry is found and [createOnMissing] is true, the entry is created with an empty coinstack
+  Future<CoinStack?> getCoinStack(int coinStackID, bool createOnMissing) async {
+    final db = await _database;
 
     var stackList = await db.query(
       _coinEntryTableName,
@@ -177,8 +189,12 @@ class DataBaseService {
       whereArgs: [coinStackID],
     );
 
-    if (stackList.isEmpty && createOnMissing) {
-      stackList = await insertCoinStack(coinStackID, CoinStack.empty());
+    if (stackList.isEmpty) {
+      if (createOnMissing) {
+        stackList = await insertCoinStack(coinStackID, CoinStack.empty());
+      } else {
+        return null;
+      }
     }
 
     Map<Coin, int> coins = {};
@@ -202,11 +218,28 @@ class DataBaseService {
     return CoinStack.withCoins(coins);
   }
 
+  // oo                                       dP
+  //                                          88
+  // dP 88d888b. .d8888b. .d8888b. 88d888b. d8888P
+  // 88 88'  `88 Y8ooooo. 88ooood8 88'  `88   88
+  // 88 88    88       88 88.  ... 88         88
+  // dP dP    dP `88888P' `88888P' dP         dP
+
+  /// inserts a new snackStack into the database
+  Future<void> insertSnackStack(SnackStack stack) async {
+    final db = await _database;
+    await db.insert(_snackStackTableName, {
+      _snackStackIDColumnName: stack.snackID,
+      _snackStackCountColumnName: stack.count,
+    });
+  }
+
+  /// inserts a new CoinStack into the database
   Future<List<Map<String, Object?>>> insertCoinStack(
     int id,
     CoinStack coinstack,
   ) async {
-    final db = await database;
+    final db = await _database;
     List<Map<String, Object?>> inserted = List.empty(growable: true);
     for (final coin in Coin.values) {
       final map = {
@@ -221,20 +254,6 @@ class DataBaseService {
     return inserted;
   }
 
-  // oo                                       dP
-  //                                          88
-  // dP 88d888b. .d8888b. .d8888b. 88d888b. d8888P
-  // 88 88'  `88 Y8ooooo. 88ooood8 88'  `88   88
-  // 88 88    88       88 88.  ... 88         88
-  // dP dP    dP `88888P' `88888P' dP         dP
-  Future<void> insertSnackStack(SnackStack stack) async {
-    final db = await database;
-    db.insert(_snackStackTableName, {
-      _snackStackIDColumnName: stack.snackID,
-      _snackStackCountColumnName: stack.count,
-    });
-  }
-
   //                         dP            dP
   //                         88            88
   // dP    dP 88d888b. .d888b88 .d8888b. d8888P .d8888b.
@@ -243,8 +262,9 @@ class DataBaseService {
   // `88888P' 88Y888P' `88888P8 `88888P8   dP   `88888P'
   //          88
   //          dP
-  Future<void> updateSnackStack(int stackID, int newCount) async {
-    final db = await database;
+  /// Sets the count value for the given SNackStack [stackID] to [newCount]
+  Future<void> updateSnackStackCount(int stackID, int newCount) async {
+    final db = await _database;
     final map = {_snackStackCountColumnName: max(newCount, 0)};
     await db.update(
       _snackStackTableName,
@@ -254,8 +274,9 @@ class DataBaseService {
     );
   }
 
+  /// Save the current vendingState
   Future<void> updateVendingState(VendingState newState) async {
-    final db = await database;
+    final db = await _database;
     final numberPadState = newState.numberPadState;
     final map = <String, dynamic>{
       _vendingStateTypeColumnName: newState.runtimeType.toString(),
@@ -273,8 +294,9 @@ class DataBaseService {
     );
   }
 
+  /// Overrides the CoinStack with the id [coinStackIndex] to [stack]
   Future<void> updateCoinstack(CoinStack stack, int coinStackIndex) async {
-    final db = await database;
+    final db = await _database;
     for (final coin in Coin.values) {
       // print(
       //   'Updating coinstack $index, coin $coin, count: ${stack.getCoinCount(coin)}',

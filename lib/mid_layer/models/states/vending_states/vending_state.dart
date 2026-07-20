@@ -20,6 +20,8 @@ abstract class VendingState {
 
   /// true, if the last state transistion was caused by some kind of error (eg snack not available)
   final bool hasError;
+
+  /// The state of the vending machine's numberpad
   final NumberPadState numberPadState;
 
   /// Describes the general state within the 'vending process' eg. if a snack is selected, what value of coins got insertet etc.
@@ -40,6 +42,7 @@ abstract class VendingState {
   /// Returns the state to transition to when the 'Return' button is pressed
   VendingState onReturnPressed();
 
+  /// Returns the updated [VendingState] resulting of the passed NumberPadState [newState]
   VendingState setNumPadState(NumberPadState newState);
 
   /// returns the current credit as a formatted € -String

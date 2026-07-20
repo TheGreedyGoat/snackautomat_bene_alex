@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
+/// Temporary - Shows every coin type as a button to insert into the vending machine
 class CoinPurse extends ConsumerWidget {
+  /// Temporary - Shows every coin type as a button to insert into the vending machine
   const CoinPurse({super.key});
 
   @override
