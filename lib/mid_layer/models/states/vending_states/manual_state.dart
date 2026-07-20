@@ -13,7 +13,7 @@ abstract class ManualState extends VendingState {
     required super.displayMessage,
     required super.numberPadState,
     super.selectedSlot,
-    super.hasError,
+    super.mode,
   }) : super(acceptsInput: true);
 
   @override

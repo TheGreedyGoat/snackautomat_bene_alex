@@ -27,12 +27,12 @@ class CoinDispense extends ConsumerWidget {
               Card.outlined(
                 color: Colors.grey,
                 child: SizedBox.square(
-                  dimension: 70,
+                  dimension: 80,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        for (int i = 0; i < min(coinsList.length, 8); i++)
+                        for (int i = 0; i < min(coinsList.length, 10); i++)
                           SizedBox(
                             height: 7,
                             width: coinsList[i].coinWidth,

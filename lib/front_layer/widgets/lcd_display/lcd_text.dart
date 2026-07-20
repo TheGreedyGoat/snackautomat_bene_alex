@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 
 /// Meant for usage in LCD display widget.
 ///
@@ -16,24 +17,23 @@ class LcdText extends StatelessWidget {
   const LcdText(
     this.data, {
     this.fontSize = 20,
-    this.hasError = false,
+    this.mode = LcdMessageMode.normal,
     super.key,
   });
 
   /// The text's content
   final String data;
+  final LcdMessageMode mode;
 
   /// The fontSize to display the text in (default: 20p)
   final double fontSize;
 
-  /// if set to true, text will be displayed red, green else
-  final bool hasError;
   @override
   Widget build(BuildContext context) {
     return Text(
       data,
       style: TextStyle(
-        color: hasError ? Colors.red : Colors.green,
+        color: mode.color,
         fontFamily: 'FixedSys',
         fontSize: fontSize,
       ),

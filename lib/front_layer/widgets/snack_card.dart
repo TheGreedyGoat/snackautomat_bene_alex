@@ -45,7 +45,7 @@ class SnackCard extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                color: const Color.fromARGB(90, 0, 0, 0),
+                color: const Color.fromARGB(200, 0, 0, 0),
                 padding: const EdgeInsets.symmetric(
                   vertical: 4,
                 ),

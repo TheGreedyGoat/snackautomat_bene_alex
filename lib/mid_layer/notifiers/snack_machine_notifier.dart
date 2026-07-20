@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
@@ -201,7 +202,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
             _vendingState is! IdleState &&
             _vendingState is! ErrorState) {
           _resetTimer = Timer(
-            Duration(seconds: 5),
+            Duration(seconds: 30),
             _reset,
           );
         } else if (_vendingState is ReturnCoinsState) {
@@ -254,7 +255,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
       _vendingState = NoSelectionState(
         credit: _vendingState.credit,
         displayMessage: 'Rückgeld nicht möglich',
-        hasError: true,
+        mode: LcdMessageMode.warning,
         numberPadState: NumberPadState.init(),
       );
     }

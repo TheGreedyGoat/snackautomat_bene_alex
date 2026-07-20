@@ -9,7 +9,7 @@ class IdleState extends ManualState {
   IdleState({
     super.displayMessage = 'Willkommen!',
     required super.numberPadState,
-    super.hasError,
+    super.mode,
   }) : super(credit: 0, selectedSlot: null);
 
   @override

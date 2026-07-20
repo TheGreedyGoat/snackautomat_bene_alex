@@ -16,7 +16,7 @@ class PayState extends ManualState {
     required super.selectedSlot,
     required super.numberPadState,
     super.displayMessage = 'Bitte bezahlen',
-    super.hasError,
+    super.mode,
   });
 
   @override
