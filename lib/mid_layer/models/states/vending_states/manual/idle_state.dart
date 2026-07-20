@@ -1,5 +1,4 @@
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
@@ -18,8 +17,4 @@ class IdleState extends ManualState {
     final newCredit = credit + coin.worth;
     return NoSelectionState(credit: newCredit, numberPadState: numberPadState);
   }
-
-  @override
-  VendingState setNumPadState(NumberPadState newState) =>
-      IdleState(numberPadState: newState);
 }

@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 
+/// An Overlay to display content behind a glass pabe
 class GlassPane extends StatelessWidget {
-  const GlassPane({super.key});
+  /// An Overlay to display content behind a glass pabe
+  const GlassPane({required this.child, this.borderRadius = 0, super.key});
+
+  /// an optional borderRadius
+  final double borderRadius;
+
+  /// The widget to put behind the glass
+  final Widget child;
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Stack(
         fit: StackFit.expand,
         children: [
+          child,
           DecoratedBox(
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -26,6 +36,8 @@ class GlassPane extends StatelessWidget {
           ),
           DecoratedBox(
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -40,6 +52,8 @@ class GlassPane extends StatelessWidget {
           ),
           DecoratedBox(
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+
               gradient: RadialGradient(
                 center: const Alignment(-0.85, -0.9),
                 radius: 1.1,
@@ -53,6 +67,8 @@ class GlassPane extends StatelessWidget {
           ),
           DecoratedBox(
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.22),
                 width: 1.5,
@@ -62,6 +78,8 @@ class GlassPane extends StatelessWidget {
 
           DecoratedBox(
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+
               image: DecorationImage(
                 fit: BoxFit.cover,
                 image: AssetImage('assets/images/dust.png'),

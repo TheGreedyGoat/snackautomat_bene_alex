@@ -2,7 +2,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
+/// 'Standalone' button to let the customer trigger get their money back.
+///
+/// Probably deprecated, since this function is now included in the NumberPad
 class ReturnButton extends ConsumerStatefulWidget {
+  /// 'Standalone' button to let the customer trigger get their money back.
+  ///
+  /// Probably deprecated, since this function is now included in the NumberPad
   const ReturnButton({super.key});
 
   @override

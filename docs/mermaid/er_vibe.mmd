@@ -1,0 +1,22 @@
+erDiagram
+    %% VENDING_MACHINE ||--o{ SNACK_SLOT : "1:n"
+    %% VENDING_MACHINE ||--|| VENDING_STATE : "1:1"
+    VENDING_STATE }|--|| SNACK_SLOT : "0..1:1"
+
+
+    COIN_STACK_ENTRY {
+        int coin_stack_id
+        int coin_type
+        int count 
+    }
+    SNACK_SLOT {
+        int snack_id PK
+        int count ">= 0"
+    }
+
+    VENDING_STATE {
+        int id PK "CHECK (id = 1) (Singleton)"
+        string type 
+        int selected_slot_id FK
+        int credit ">= 0"
+    }

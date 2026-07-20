@@ -1,6 +1,7 @@
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/return_coins_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/no_selection_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/pay_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 
@@ -23,11 +24,14 @@ abstract class ManualState extends VendingState {
   }
 
   @override
-  VendingState onSnackSelected(int slot) {
-    return PayState(
-      credit: credit,
-      selectedSlot: slot,
-      numberPadState: numberPadState,
-    );
+  VendingState setNumPadState(NumberPadState newState) {
+    final selectionValue = newState.value;
+    return selectionValue == null
+        ? NoSelectionState(credit: credit, numberPadState: newState)
+        : PayState(
+            credit: credit,
+            selectedSlot: selectionValue,
+            numberPadState: newState,
+          );
   }
 }

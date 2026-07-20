@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'glass_pane.dart';
+import 'backgrounds_overlays/glass_pane.dart';
 
 class VendingDisplay extends StatelessWidget {
   final Widget child;
@@ -27,13 +27,15 @@ class VendingDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          child,
-          const GlassPane(),
-        ],
+      child: GlassPane(
+        child: child,
       ),
+      // Stack(
+      //   fit: StackFit.expand,
+      //   children: [
+      //     child,
+      //   ],
+      // ),
     );
   }
 }

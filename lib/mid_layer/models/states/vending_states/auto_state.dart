@@ -19,9 +19,6 @@ abstract class AutoState extends VendingState {
   @override
   VendingState onReturnPressed() => this;
 
-  @override
-  VendingState onSnackSelected(int slot) => this;
-
   /// Returns the next state after the event waited for occured
   VendingState onFinished();
 
