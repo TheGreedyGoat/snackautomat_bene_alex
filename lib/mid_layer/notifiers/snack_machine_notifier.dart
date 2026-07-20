@@ -65,8 +65,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     print(coinStorage);
     var change = (await _dbService.getCoinStack(_coinChangeID, true))!;
     var snackStorage = await _dbService.getSnackStacks();
-    // fehlende Slots nachlegen (z.B. wenn die DB noch von einer
-    // Version mit weniger Slots stammt) und danach neu laden
+    //fill missing slots
     if (snackStorage.length < snacks.length) {
       for (int i = snackStorage.length; i < snacks.length; i++) {
         await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));

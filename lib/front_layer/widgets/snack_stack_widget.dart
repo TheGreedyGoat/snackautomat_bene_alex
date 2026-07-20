@@ -22,7 +22,6 @@ class SnackStackWidget extends StatefulWidget {
 
 class _SnackStackWidgetState extends State<SnackStackWidget>
     with SingleTickerProviderStateMixin {
- 
   static const double _cardExtent = 188;
   late int snackCount;
 
@@ -73,7 +72,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
     final box = stackKey.currentContext!.findRenderObject() as RenderBox;
     final overlay = Overlay.of(context);
     final overlayBox = overlay.context.findRenderObject() as RenderBox;
-   
+
     final globalPosition = box.localToGlobal(
       Offset(0, box.size.height - _cardExtent),
     );
@@ -207,7 +206,6 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
             .setDispenseCallBack(widget.stack.snackID, removeSnack);
         return SizedBox(
           key: stackKey,
-          // eng am Inhalt: Karte + Versatz für max. 5 gestapelte Snacks
           width: 200,
           height: 216,
           child: Stack(
@@ -217,7 +215,6 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                  // von unten stapeln, damit alles in der Box bleibt
                   bottom: i * 6.3,
                   left: i * 2,
                   child: Opacity(
