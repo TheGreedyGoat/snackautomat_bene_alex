@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
+import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 
 /// The slot where returned coins will show up
@@ -14,45 +16,57 @@ class CoinDispense extends ConsumerWidget {
     return stateAs.when(
       loading: () => Placeholder(),
       error: (error, stackTrace) => Placeholder(),
-      data: (state) => GestureDetector(
-        onTap: () {
-          ref.read(snackMachineProvider.notifier).emptyChange();
-        },
-        child: Column(
-          children: [
-            Card.outlined(
-              child: SizedBox.square(
-                dimension: 70,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      for (
-                        int i = 0;
-                        i < min(state.changeSlot.totalCoins, 8);
-                        i++
-                      )
-                        SizedBox(
-                          height: 10,
-                          width: (Random().nextDouble() * 30) + 60,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Random().nextBool()
-                                  ? Colors.amber
-                                  : Colors.blueGrey,
-                              border: BoxBorder.all(),
+      data: (state) {
+        final coinsList = state.changeSlot.toList();
+        return GestureDetector(
+          onTap: () {
+            ref.read(snackMachineProvider.notifier).emptyChange();
+          },
+          child: Column(
+            children: [
+              Card.outlined(
+                color: Colors.grey,
+                child: SizedBox.square(
+                  dimension: 70,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        for (int i = 0; i < min(coinsList.length, 8); i++)
+                          SizedBox(
+                            height: 7,
+                            width: coinsList[i].coinWidth,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  // stops: [1],
+                                  stops: [
+                                    0.00001,
+                                    0.3,
+                                    0.7,
+                                    0.99999,
+                                  ],
+                                  colors: [
+                                    Colors.black,
+                                    coinsList[i].coinColor,
+                                    coinsList[i].coinColor,
+                                    Colors.black,
+                                  ],
+                                ),
+                                border: BoxBorder.all(),
+                              ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Card(child: Text('total: ${state.changeSlot.sumDisplay}')),
-          ],
-        ),
-      ),
+              Card(child: Text('total: ${state.changeSlot.sumDisplay}')),
+            ],
+          ),
+        );
+      },
     );
   }
 }

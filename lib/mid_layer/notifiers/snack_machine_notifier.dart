@@ -21,24 +21,49 @@ import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 /// Placeholder snacks
 final snacks = [
   const Snack(
-    name: 'Twix',
+    name: 'Nuka Cola',
     price: 120,
-    image: 'assets/images/Twix.png',
+    image: 'assets/images/nuka_classic.png',
   ),
   const Snack(
-    name: 'Rafaelo',
+    name: 'Nuka Cola Dark',
+    price: 120,
+    image: 'assets/images/nuka_dark.png',
+  ),
+  const Snack(
+    name: 'Nuka Cola Orange',
+    price: 120,
+    image: 'assets/images/nuka_orange.png',
+  ),
+  const Snack(
+    name: 'Nuka Cola Quantum',
     price: 223,
-    image: 'assets/images/Rafaelo.png',
+    image: 'assets/images/nuka_quantum.png',
   ),
   const Snack(
-    name: 'Pringles',
-    price: 300,
-    image: 'assets/images/Pringles.png',
+    name: 'Nuka Cherry',
+    price: 120,
+    image: 'assets/images/nuka_cherry.png',
   ),
   const Snack(
-    name: 'Milka Oreo',
+    name: 'Rad Away',
     price: 300,
-    image: 'assets/images/MilkaOreo.png',
+    image: 'assets/images/rad_away.png',
+  ),
+  const Snack(
+    name: 'BlamCo Mac & Cheese',
+    price: 300,
+    image: 'assets/images/blamco.png',
+  ),
+  const Snack(
+    name: 'Cram',
+    price: 300,
+    image: 'assets/images/cram.png',
+  ),
+  const Snack(
+    name: 'Sugar Bombs',
+    price: 300,
+    image: 'assets/images/sugar_bombs.png',
   ),
 ];
 
@@ -59,9 +84,12 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     print(coinStorage);
     var change = (await _dbService.getCoinStack(_coinChangeID, true))!;
     var snackStorage = await _dbService.getSnackStacks();
-    if (snackStorage.isEmpty) {
-      for (int i = 0; i < snacks.length; i++) {
-        await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));
+
+    for (int i = 0; i < snacks.length; i++) {
+      if (i >= snackStorage.length) {
+        final stack = SnackStack(snackID: i, count: 5);
+        await _dbService.insertSnackStack(stack);
+        snackStorage.add(stack);
       }
     }
     _dispenseAnimationCallbacks = snackStorage
@@ -69,6 +97,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
           (_) => _defaultAutoTimer,
         )
         .toList(growable: false);
+
     var vendingState = await _dbService.vendingState;
     if (!coinStorage.canReturnAmount(vendingState.credit)) {
       vendingState = IdleState(numberPadState: NumberPadState.init());

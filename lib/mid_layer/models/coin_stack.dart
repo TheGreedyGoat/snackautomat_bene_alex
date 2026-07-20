@@ -182,6 +182,18 @@ class CoinStack {
   /// Returns the summed up coin values as a readable formatted String
   String get sumDisplay => MoneyConverter.centsToEutoDisplay(sum);
 
+  List<Coin> toList() {
+    List<Coin> result = List.empty(growable: true);
+
+    for (final coin in coins.keys) {
+      for (int i = 0; i < coins[coin]!; i++) {
+        result.add(coin);
+      }
+    }
+
+    return result;
+  }
+
   @override
   String toString() => _coins.toString();
 }

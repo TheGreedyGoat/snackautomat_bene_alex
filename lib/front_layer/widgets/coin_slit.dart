@@ -58,7 +58,7 @@ class CoinSlit extends StatelessWidget {
                               offset: Offset(1, 1),
                             ),
                           ],
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderRadius: BorderRadius.all(Radius.circular(1)),
                         ),
                       ),
                     ),
