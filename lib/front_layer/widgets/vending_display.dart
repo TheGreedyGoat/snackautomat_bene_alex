@@ -2,13 +2,45 @@ import 'package:flutter/material.dart';
 
 import 'backgrounds_overlays/glass_pane.dart';
 
-class VendingDisplay extends StatelessWidget {
+///Swingable glass door with hinges on the left
+class VendingDisplay extends StatefulWidget {
   final Widget child;
 
   const VendingDisplay({
     super.key,
     required this.child,
   });
+
+  @override
+  State<VendingDisplay> createState() => _VendingDisplayState();
+}
+
+class _VendingDisplayState extends State<VendingDisplay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  );
+
+  // tilt 110 degree
+  late final Animation<double> _angle = Tween(begin: 0.0, end: 1.9).animate(
+    CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
+  );
+
+  void _toggleDoor() {
+    if (_controller.status == AnimationStatus.forward ||
+        _controller.status == AnimationStatus.completed) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +55,79 @@ class VendingDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: GlassPane(
-        child: child,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          widget.child,
+          IgnorePointer(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Transform(
+                  alignment: Alignment.centerLeft,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.0004)
+                    ..rotateY(_angle.value),
+                  child: _GlassDoor(
+                    showThickness: _controller.value > 0.001,
+                  ),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                final open = _controller.value > 0.001;
+                return FloatingActionButton.small(
+                  heroTag: 'glassDoorButton',
+                  backgroundColor: const Color(0xFF3A3A3A),
+                  foregroundColor: const Color(0xFFFFBF00),
+                  onPressed: _toggleDoor,
+                  child: Icon(open ? Icons.meeting_room : Icons.sensor_door),
+                );
+              },
+            ),
+          ),
+        ],
       ),
-      // Stack(
-      //   fit: StackFit.expand,
-      //   children: [
-      //     child,
-      //   ],
-      // ),
+    );
+  }
+}
+
+class _GlassDoor extends StatelessWidget {
+  final bool showThickness;
+
+  const _GlassDoor({required this.showThickness});
+
+  static const double _thickness = 26;
+  static const int _layers = 13;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (showThickness)
+          for (int i = _layers; i >= 1; i--)
+            Transform(
+              transform: Matrix4.identity()
+                ..translateByDouble(0, 0, i * _thickness / _layers, 1),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  // no face fill — stacked translucent whites turn milky
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.07),
+                    width: 1,
+                  ),
+                ),
+              ),
+            ),
+        const GlassPane(child: SizedBox.expand()),
+      ],
     );
   }
 }
