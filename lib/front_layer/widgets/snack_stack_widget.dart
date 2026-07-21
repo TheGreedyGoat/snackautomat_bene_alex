@@ -158,7 +158,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       removing = true;
     });
 
-    // Schranke auf, dann Snack fallen lassen, dann Schranke zu
+    // open the gate, drop the snack, then close the gate again
     await gateController.forward();
 
     final entry = OverlayEntry(
@@ -219,7 +219,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
             Expanded(
               child: Align(
                 alignment: Alignment.topCenter,
-                // ca. um die Hälfte der eigenen Größe nach unten
+                // move the snacks a bit down
                 child: FractionalTranslation(
                   translation: const Offset(0, 0.5),
                   child: FittedBox(

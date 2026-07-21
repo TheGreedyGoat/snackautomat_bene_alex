@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Metallschranke mit fester Balkenhöhe (Breite vom Parent).
-/// [open] 0 = zu, 1 = offen (hochgeklappt).
+/// Small metal bar under each snack.
+/// open = 0 means closed, open = 1 means flipped up.
 class MetalGate extends StatelessWidget {
   final double open;
 

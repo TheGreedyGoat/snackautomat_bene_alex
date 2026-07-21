@@ -10,9 +10,9 @@ class SnackView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Rahmen und Glasscheibe kommen hier drum
+    // frame + glass come from VendingDisplay
     return VendingDisplay(
-      // Gitter hinten, Snacks darüber, Glas davor (in VendingDisplay)
+      // metal grid in the back, snacks on top, glass is in VendingDisplay
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -20,7 +20,7 @@ class SnackView extends ConsumerWidget {
             'assets/images/decoration/Metallgitter.png',
             fit: BoxFit.fill,
           ),
-          // damit der fallende Snack vor den anderen ist
+          // overlay so the falling snack can go in front of the others
           Overlay(
             initialEntries: [
               OverlayEntry(
@@ -37,12 +37,12 @@ class SnackView extends ConsumerWidget {
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
 
-  // Metallgitter: 6 Spalten × 4 Reihen
+  // fixed grid: 6 columns, 4 rows
   static const int columns = 6;
   static const int rows = 4;
 
-  // Fach-Innenkanten als Anteile der Metallgitter-Textur (gemessen am Asset),
-  // damit die Snacks in den dunklen Fächern sitzen und nicht auf den Stegen.
+  // edges of each slot, measured from the metal grid image
+  // so the snacks sit in the dark holes and not on the bars
   static const List<double> _colLefts = [
     90 / 1254,
     256 / 1254,
@@ -72,7 +72,7 @@ class _SnackGrid extends ConsumerWidget {
     1163 / 1254,
   ];
 
-  // Vorderkante der Regalböden (wo die Nummernschilder kleben)
+  // middle of the shelf edges (for the number stickers)
   static const List<double> _shelfMids = [
     0.2356,
     0.4697,
@@ -80,8 +80,8 @@ class _SnackGrid extends ConsumerWidget {
     0.9370,
   ];
 
-  /// Positioniert den Slot zentriert im Fach; alle Slots gleich breit
-  /// (am schmalsten Fach), damit Schranken einheitlich sind.
+  /// Puts one snack slot in the middle of its hole.
+  /// All slots use the same width (smallest hole) so the gates look the same.
   Widget _slotAt({
     required int index,
     required double width,
@@ -96,6 +96,7 @@ class _SnackGrid extends ConsumerWidget {
     final cellW = (_colRights[col] - _colLefts[col]) * width;
     final cellH = (_rowBottoms[row] - _rowTops[row]) * height;
 
+    // tiny fixes so it lines up better with the picture
     final nudgeDown = height * 0.01;
     final nudgeLeft = col == columns - 1 ? width * 0.022 : 0.0;
 
@@ -108,7 +109,7 @@ class _SnackGrid extends ConsumerWidget {
     );
   }
 
-  /// Nummernschild auf dem Regalboden, als wäre es aufgeklebt.
+  /// Number sticker on the shelf, looks like it's stuck on the metal.
   Widget _shelfLabel({
     required int index,
     required double width,
@@ -153,7 +154,7 @@ class _SnackGrid extends ConsumerWidget {
             final w = constraints.maxWidth;
             final h = constraints.maxHeight;
 
-            // einheitliche Slot-/Schrankenbreite: schmalstes Fach
+            // same width for every slot/gate = width of the smallest hole
             var minCellW = double.infinity;
             for (var c = 0; c < columns; c++) {
               final cellW = (_colRights[c] - _colLefts[c]) * w;
@@ -191,7 +192,7 @@ class _SnackGrid extends ConsumerWidget {
   }
 }
 
-/// Abgenutztes Metallschild, das auf dem Regalboden klebt.
+/// Small metal looking sticker for the slot number.
 class _SlotShelfSticker extends StatelessWidget {
   final String label;
 

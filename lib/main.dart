@@ -18,9 +18,9 @@ Future<void> main() async {
   runTestApp();
 }
 
-//Minimal height 3/4 of the desktop height
-//Minimal width 1/3 of the desktop width
-//TODO: Maybe find another solution to make the app always look good on all screens
+// min height = 3/4 of the desktop height
+// min width = about 1/3 of the desktop width (we use / 2.5)
+// TODO: maybe find a better way so it always looks ok on every screen
 Future<void> _configureDesktopWindow() async {
   final screen = await getCurrentScreen();
   if (screen == null) return;

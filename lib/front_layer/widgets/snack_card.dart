@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../mid_layer/models/snack.dart';
 
-//Fake 3D thickness effect for the snack card
+// Fake 3D look for the snack card (stacked layers behind it)
 class ThickSnackCard extends StatelessWidget {
   final Snack snack;
   final int index;
