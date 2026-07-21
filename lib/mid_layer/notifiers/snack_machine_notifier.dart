@@ -42,10 +42,10 @@ const _snackTypes = [
   ),
 ];
 
-/// Placeholder snacks: 16 slots for the 4x4 grid,
+/// Placeholder snacks: 24 slots for the 6x4 metal grid,
 /// the 4 types just repeat until all slots are filled
 final snacks = [
-  for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
+  for (int i = 0; i < 24; i++) _snackTypes[i % _snackTypes.length],
 ];
 
 /// The core logical unit of the state machine.

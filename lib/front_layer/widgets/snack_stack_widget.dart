@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
+import 'metal_gate.dart';
 import 'snack_card.dart';
 
 class SnackStackWidget extends StatefulWidget {
   final SnackStack stack;
   final bool dispense;
+  final double gateWidth;
   final void Function() onAnimationFinished;
   const SnackStackWidget({
     super.key,
     required this.stack,
+    required this.gateWidth,
     required this.onAnimationFinished,
     this.dispense = false,
   });
@@ -21,11 +24,12 @@ class SnackStackWidget extends StatefulWidget {
 }
 
 class _SnackStackWidgetState extends State<SnackStackWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   static const double _cardExtent = 188;
   late int snackCount;
 
   late AnimationController controller;
+  late AnimationController gateController;
 
   late Animation<double> fall;
   late Animation<double> rotation;
@@ -50,6 +54,10 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
+    gateController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
   }
 
   @override
@@ -63,6 +71,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
   @override
   void dispose() {
     controller.dispose();
+    gateController.dispose();
     super.dispose();
   }
 
@@ -149,6 +158,9 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       removing = true;
     });
 
+    // Schranke auf, dann Snack fallen lassen, dann Schranke zu
+    await gateController.forward();
+
     final entry = OverlayEntry(
       builder: (_) {
         return AnimatedBuilder(
@@ -183,17 +195,15 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
 
     await controller.forward();
     entry.remove();
+    await gateController.reverse();
     if (!mounted) return;
     setState(() {
-      // snackCount--;
       removing = false;
     });
-    // widget.onAnimationFinished();
     controller.reset();
   }
 
   void handleTap() {
-    // widget.onTap?.call();
     removeSnack();
   }
 
@@ -204,29 +214,58 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
         ref
             .read(snackMachineProvider.notifier)
             .setDispenseCallBack(widget.stack.snackID, removeSnack);
-        return SizedBox(
-          key: stackKey,
-          width: 200,
-          height: 216,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              for (int i = snackCount - 1; i >= 0; i--)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                  bottom: i * 6.3,
-                  left: i * 2,
-                  child: Opacity(
-                    opacity: (i == 0 && removing) ? 0 : 1,
-                    child: SnackCard(
-                      snack: widget.stack.snack,
-                      index: i,
+        return Column(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                // ca. um die Hälfte der eigenen Größe nach unten
+                child: FractionalTranslation(
+                  translation: const Offset(0, 0.5),
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      key: stackKey,
+                      width: 200,
+                      height: 216,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          for (int i = snackCount - 1; i >= 0; i--)
+                            AnimatedPositioned(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOut,
+                              bottom: i * 6.3,
+                              left: i * 2,
+                              child: Opacity(
+                                opacity: (i == 0 && removing) ? 0 : 1,
+                                child: SnackCard(
+                                  snack: widget.stack.snack,
+                                  index: i,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-            ],
-          ),
+              ),
+            ),
+            Center(
+              child: SizedBox(
+                width: widget.gateWidth,
+                child: AnimatedBuilder(
+                  animation: gateController,
+                  builder: (context, child) {
+                    return MetalGate(
+                      open: Curves.easeInOut.transform(gateController.value),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         );
       },
     );

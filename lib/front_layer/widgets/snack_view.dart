@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
@@ -13,11 +12,21 @@ class SnackView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Rahmen und Glasscheibe kommen hier drum
     return VendingDisplay(
-      // damit der fallende Snack vor den anderen ist
-      child: Overlay(
-        initialEntries: [
-          OverlayEntry(
-            builder: (_) => const _SnackGrid(),
+      // Gitter hinten, Snacks darüber, Glas davor (in VendingDisplay)
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/decoration/Metallgitter.png',
+            fit: BoxFit.fill,
+          ),
+          // damit der fallende Snack vor den anderen ist
+          Overlay(
+            initialEntries: [
+              OverlayEntry(
+                builder: (_) => const _SnackGrid(),
+              ),
+            ],
           ),
         ],
       ),
@@ -28,15 +37,108 @@ class SnackView extends ConsumerWidget {
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
 
-  // festes Raster: immer 4x4 Plätze
-  static const int columns = 4;
+  // Metallgitter: 6 Spalten × 4 Reihen
+  static const int columns = 6;
   static const int rows = 4;
+
+  // Fach-Innenkanten als Anteile der Metallgitter-Textur (gemessen am Asset),
+  // damit die Snacks in den dunklen Fächern sitzen und nicht auf den Stegen.
+  static const List<double> _colLefts = [
+    90 / 1254,
+    256 / 1254,
+    444 / 1254,
+    636 / 1254,
+    829 / 1254,
+    1015 / 1254,
+  ];
+  static const List<double> _colRights = [
+    232 / 1254,
+    420 / 1254,
+    612 / 1254,
+    805 / 1254,
+    991 / 1254,
+    1228 / 1254,
+  ];
+  static const List<double> _rowTops = [
+    22 / 1254,
+    303 / 1254,
+    600 / 1254,
+    893 / 1254,
+  ];
+  static const List<double> _rowBottoms = [
+    288 / 1254,
+    578 / 1254,
+    873 / 1254,
+    1163 / 1254,
+  ];
+
+  // Vorderkante der Regalböden (wo die Nummernschilder kleben)
+  static const List<double> _shelfMids = [
+    0.2356,
+    0.4697,
+    0.7041,
+    0.9370,
+  ];
+
+  /// Positioniert den Slot zentriert im Fach; alle Slots gleich breit
+  /// (am schmalsten Fach), damit Schranken einheitlich sind.
+  Widget _slotAt({
+    required int index,
+    required double width,
+    required double height,
+    required double slotWidth,
+    required Widget child,
+  }) {
+    final col = index % columns;
+    final row = index ~/ columns;
+    final cellLeft = _colLefts[col] * width;
+    final cellTop = _rowTops[row] * height;
+    final cellW = (_colRights[col] - _colLefts[col]) * width;
+    final cellH = (_rowBottoms[row] - _rowTops[row]) * height;
+
+    final nudgeDown = height * 0.01;
+    final nudgeLeft = col == columns - 1 ? width * 0.022 : 0.0;
+
+    return Positioned(
+      left: cellLeft + (cellW - slotWidth) / 2 - nudgeLeft,
+      top: cellTop + cellH * 0.04 + nudgeDown,
+      width: slotWidth,
+      height: cellH * 0.78,
+      child: child,
+    );
+  }
+
+  /// Nummernschild auf dem Regalboden, als wäre es aufgeklebt.
+  Widget _shelfLabel({
+    required int index,
+    required double width,
+    required double height,
+  }) {
+    final col = index % columns;
+    final row = index ~/ columns;
+    final cellLeft = _colLefts[col] * width;
+    final cellW = (_colRights[col] - _colLefts[col]) * width;
+    final nudgeLeft = col == columns - 1 ? width * 0.022 : 0.0;
+
+    final labelW = cellW * 0.78;
+    final labelH = height * 0.034;
+    final left = cellLeft + (cellW - labelW) / 2 - nudgeLeft;
+    final top = _shelfMids[row] * height - labelH / 2;
+
+    return Positioned(
+      left: left,
+      top: top,
+      width: labelW,
+      height: labelH,
+      child: _SlotShelfSticker(
+        label: index.toString().padLeft(3, '0'),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // baut neu wenn sich ein Snack ändert
     final state = ref.watch(snackMachineProvider);
-    // damit weiß ich wieviel Platz das Raster hat
     return state.when(
       loading: () => Placeholder(color: Colors.yellow),
       error: (error, stackTrace) => Placeholder(
@@ -44,61 +146,110 @@ class _SnackGrid extends ConsumerWidget {
       ),
       data: (state) {
         final slots = state.snackStorage;
-        print('Slots count: ${slots.length}');
+        final selected = state.vendingState.selectedSlot;
+
         return LayoutBuilder(
           builder: (context, constraints) {
-            // Abstände skalieren ein bischen mit
-            final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
-            final spacing = 10 * rasterScale;
+            final w = constraints.maxWidth;
+            final h = constraints.maxHeight;
 
-            final cellWidth = max(
-              1.0,
-              (constraints.maxWidth - 2 * spacing - (columns - 1) * spacing) /
-                  columns,
-            );
+            // einheitliche Slot-/Schrankenbreite: schmalstes Fach
+            var minCellW = double.infinity;
+            for (var c = 0; c < columns; c++) {
+              final cellW = (_colRights[c] - _colLefts[c]) * w;
+              if (cellW < minCellW) minCellW = cellW;
+            }
+            final slotWidth = minCellW * 0.92;
 
-            final cellHeight = max(
-              1.0,
-              (constraints.maxHeight - 2 * spacing - (rows - 1) * spacing - 1) /
-                  rows,
-            );
-
-            final selected = state.vendingState.selectedSlot;
-            return GridView.builder(
-              // sollte alles reinpassen, scrollen ist also aus
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(spacing),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                crossAxisSpacing: spacing,
-                mainAxisSpacing: spacing,
-                childAspectRatio: max(cellWidth / cellHeight, 0.5),
-              ),
-              // immer alle 16 Zellen, auch wenn weniger Snacks da sind
-              itemCount: columns * rows,
-              itemBuilder: (context, index) {
-                // leere Plätze bleiben einfach frei
-                if (index >= slots.length) {
-                  return const SizedBox.shrink();
-                }
-
-                final slot = slots[index];
-                final stackWidget = SnackStackWidget(
-                  stack: slot,
-                  dispense:
-                      state.vendingState is DispenseSnackState &&
-                      selected == index,
-                  onAnimationFinished: () =>
-                      ref.read(snackMachineProvider.notifier).onFinished(),
-                );
-
-                // skaliert den ganzen Snack und nicht nur das Bild
-                return FittedBox(fit: BoxFit.contain, child: stackWidget);
-              },
+            return Stack(
+              children: [
+                for (int index = 0; index < columns * rows; index++)
+                  if (index < slots.length) ...[
+                    _slotAt(
+                      index: index,
+                      width: w,
+                      height: h,
+                      slotWidth: slotWidth,
+                      child: SnackStackWidget(
+                        stack: slots[index],
+                        gateWidth: slotWidth,
+                        dispense: state.vendingState is DispenseSnackState &&
+                            selected == index,
+                        onAnimationFinished: () => ref
+                            .read(snackMachineProvider.notifier)
+                            .onFinished(),
+                      ),
+                    ),
+                    _shelfLabel(index: index, width: w, height: h),
+                  ],
+              ],
             );
           },
         );
       },
+    );
+  }
+}
+
+/// Abgenutztes Metallschild, das auf dem Regalboden klebt.
+class _SlotShelfSticker extends StatelessWidget {
+  final String label;
+
+  const _SlotShelfSticker({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(3),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF4A4A4A),
+            Color(0xFF2A2A2A),
+            Color(0xFF1A1A1A),
+          ],
+        ),
+        border: Border.all(color: const Color(0xFF6A6A6A), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.55),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'FixedSys',
+                fontSize: 42,
+                height: 1,
+                letterSpacing: 3,
+                color: const Color(0xFFFFBF00).withValues(alpha: 0.95),
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.8),
+                    offset: const Offset(1, 1),
+                    blurRadius: 0,
+                  ),
+                  Shadow(
+                    color: const Color(0xFFFFBF00).withValues(alpha: 0.35),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
