@@ -21,7 +21,9 @@ class VendingMachinePage extends StatelessWidget {
           children: [
             Expanded(
               child: RustyRoundedBox(
-                color: Color(0xffBA1724),
+                deocration: BoxDecoration(
+                  color: Color(0xffBA1724),
+                ),
                 child: Column(
                   children: [
                     Row(

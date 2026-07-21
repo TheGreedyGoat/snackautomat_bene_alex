@@ -6,12 +6,11 @@ class RustyRoundedBox extends StatelessWidget {
   /// The content to show on the rusty box
   final Widget? child;
 
-  /// An optional color to layer the rusty texture on top of
-  final Color? color;
+  final BoxDecoration? deocration;
 
   /// Displays a box with a rusty texture, rounded corners and ahadows to make it seem like a 3D box
   const RustyRoundedBox({
-    this.color,
+    this.deocration,
     this.child,
     super.key,
   });
@@ -19,8 +18,7 @@ class RustyRoundedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Rusty(
-      color: color,
-      borderRadius: 25,
+      decoration: deocration?.copyWith(borderRadius: BorderRadius.circular(25)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           image: DecorationImage(
