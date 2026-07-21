@@ -68,6 +68,12 @@ final snacks = [
   ),
 ];
 
+/// Placeholder snacks: 16 slots for the 4x4 grid,
+/// the 4 types just repeat until all slots are filled
+final snacks = [
+  for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
+];
+
 /// The core logical unit of the state machine.
 ///
 /// Manages all the communication about the snack machine's inventory and current vending state
@@ -92,6 +98,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
         await _dbService.insertSnackStack(stack);
         snackStorage.add(stack);
       }
+      snackStorage = await _dbService.getSnackStacks();
     }
     _dispenseAnimationCallbacks = snackStorage
         .map(
