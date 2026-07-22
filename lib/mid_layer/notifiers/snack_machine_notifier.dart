@@ -18,8 +18,6 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ma
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-// TODO: Switch to Fallout items
-/// Placeholder snacks
 final snacks = [
   const Snack(
     name: 'Nuka Cola',
@@ -70,9 +68,9 @@ final snacks = [
 
 /// Placeholder snacks: 16 slots for the 4x4 grid,
 /// the 4 types just repeat until all slots are filled
-final snacks = [
-  for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
-];
+// final snacks = [
+//   for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
+// ];
 
 /// The core logical unit of the state machine.
 ///
