@@ -9,7 +9,7 @@ class NoSelectionState extends ManualState {
     required super.credit,
     required super.numberPadState,
     super.displayMessage = 'Bitte wählen Sie',
-    super.hasError,
+    super.mode,
   });
 
   @override

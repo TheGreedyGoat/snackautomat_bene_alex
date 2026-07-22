@@ -1,3 +1,4 @@
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/auto_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
@@ -10,8 +11,7 @@ class ReturnCoinsState extends AutoState {
   ReturnCoinsState({
     required super.credit,
     super.displayMessage = 'Rückgabe...',
-    super.hasError,
-  });
+  }) : super(mode: LcdMessageMode.normal);
 
   @override
   VendingState onFinished() => IdleState(numberPadState: NumberPadState.init());

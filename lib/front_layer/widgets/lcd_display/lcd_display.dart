@@ -39,12 +39,6 @@ class LcdDisplay extends StatelessWidget {
         borderRadius: 10,
         child: content,
       ),
-      // Stack(
-      //   fit: StackFit.expand,
-      //   children: [
-      //     content,
-      //   ],
-      // ),
     ),
   );
 }

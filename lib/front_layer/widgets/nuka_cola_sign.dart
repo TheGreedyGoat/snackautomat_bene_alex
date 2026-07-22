@@ -61,13 +61,17 @@ class _NukaColaSignState extends State<NukaColaSign> {
             boxShadow: [BoxShadow(spreadRadius: 5, blurRadius: 5)],
           ),
           child: Rusty(
-            borderRadius: 1000,
-            color: Colors.white,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Rusty(
-                color: Colors.black,
-                borderRadius: 1000,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                ),
                 child: Stack(
                   children: [
                     _getImage('all_off'),

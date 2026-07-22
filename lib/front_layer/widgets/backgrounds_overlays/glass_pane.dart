@@ -81,8 +81,9 @@ class GlassPane extends StatelessWidget {
               borderRadius: BorderRadius.circular(borderRadius),
 
               image: DecorationImage(
+                opacity: 0.5,
                 fit: BoxFit.cover,
-                image: AssetImage('assets/images/dust.png'),
+                image: AssetImage('assets/images/decoration/dust.png'),
               ),
             ),
           ),

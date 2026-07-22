@@ -175,7 +175,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
           animation: controller,
           child: ThickSnackCard(
             snack: widget.stack.snack,
-            index: 0,
+            index: widget.stack.snackID,
           ),
           builder: (_, child) {
             return Positioned(
@@ -244,7 +244,6 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut,
                               bottom: i * 6.3,
-                              // left half stacks up-left, right half up-right
                               left: widget.stackBias >= 0
                                   ? i * 2.0 * widget.stackBias.abs()
                                   : null,

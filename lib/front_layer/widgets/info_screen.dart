@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/nuka_cola_ascii.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_display.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_text.dart';
@@ -41,7 +43,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(snackMachineProvider);
     return LcdDisplay(
-      height: 200,
+      height: 300,
       child: state.when(
         data: (state) {
           final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
@@ -50,16 +52,31 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                LcdTitle(title),
+                // Column(
+                //   mainAxisAlignment: MainAxisAlignment.start,
+                //   children: [
+                //     // LcdText(state.vendingState.credit.toString()),
+                //   ],
+                // ),
+                Row(
+                  // mainAxisAlignment: MainAxisAlignment.s,
                   children: [
-                    LcdTitle(title),
-                    LcdText(state.vendingState.credit.toString()),
+                    const NukaColaAscii(
+                      fontSize: 13,
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          LcdText(
+                            state.vendingState.displayMessage,
+                            mode: state.vendingState.mode,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                ),
-                LcdText(
-                  state.vendingState.displayMessage,
-                  hasError: state.vendingState.hasError,
                 ),
 
                 Column(
@@ -93,13 +110,19 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
         error: (error, stackTrace) {
           return Column(
             children: [
-              LcdText(title, hasError: true),
+              LcdText(
+                title,
+                mode: LcdMessageMode.error,
+              ),
 
-              LcdText(error.toString(), hasError: true),
+              LcdText(error.toString(), mode: LcdMessageMode.error),
             ],
           );
         },
-        loading: () => LcdText('loading'),
+        loading: () => LcdText(
+          'loading',
+          mode: LcdMessageMode.warning,
+        ),
       ),
     );
   }

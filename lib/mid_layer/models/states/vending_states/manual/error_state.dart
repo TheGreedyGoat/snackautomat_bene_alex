@@ -1,3 +1,4 @@
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual_state.dart';
@@ -11,7 +12,7 @@ class ErrorState extends ManualState {
     required super.credit,
     required super.numberPadState,
     super.displayMessage = 'ERROR',
-  }) : super(hasError: true);
+  }) : super(mode: LcdMessageMode.error);
 
   @override
   VendingState onCoinInserted(Coin coin) => ErrorState(

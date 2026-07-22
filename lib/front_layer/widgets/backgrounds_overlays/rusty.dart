@@ -1,45 +1,44 @@
 import 'package:flutter/material.dart';
 
+enum RustLevel {
+  light(texture: 'assets/images/decoration/rusty_light.png'),
+  medium(texture: 'assets/images/decoration/rusty_overlay.png');
+
+  final String texture;
+  const RustLevel({required this.texture});
+}
+
 /// A decorated box resembling a rusty painted metal texture
 class Rusty extends StatelessWidget {
-  /// The color to layer the rust on
-  final Color? color;
+  final BoxDecoration? decoration;
 
   /// optional content
   final Widget? child;
 
-  ///
-  final double? borderRadius;
-
-  ///
-  final BoxShape boxShape;
+  final RustLevel rustLevel;
 
   /// A decorated box resembling a rusty painted metal texture
   const Rusty({
-    this.color,
     this.child,
-    this.borderRadius,
-    this.boxShape = BoxShape.rectangle,
+    this.decoration,
+    this.rustLevel = RustLevel.medium,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final rustyTexture = DecorationImage(
+      repeat: ImageRepeat.repeat,
+      fit: BoxFit.cover,
+      alignment: AlignmentGeometry.centerLeft,
+      scale: 0.5,
+      image: AssetImage(rustLevel.texture),
+    );
+
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: borderRadius != null
-            ? BorderRadius.circular(borderRadius!)
-            : null,
-        shape: boxShape,
-        image: DecorationImage(
-          repeat: ImageRepeat.repeat,
-          fit: BoxFit.cover,
-          alignment: AlignmentGeometry.centerLeft,
-          scale: 0.5,
-          image: AssetImage('assets/images/decoration/rusty_overlay.png'),
-        ),
-      ),
+      decoration:
+          decoration?.copyWith(image: rustyTexture) ??
+          BoxDecoration(image: rustyTexture),
 
       child: child,
     );
