@@ -46,13 +46,13 @@ class _SnackGrid extends ConsumerWidget {
 
   // fixed layout
   static const startX = 43.0;
-  static const startY = 17.0;
+  static const startY = 30.0;
   static const slotW = 121.0;
-  static const slotH = 160.0;
+  static const slotH = 136.0;
   static const snackSize = 90.0;
   static const gateWidth = 100.0;
-  static const gateOffsetY = -35.0; // how far below the snack stack
-  static const labelOffsetY = -14.0; // how far below the snack stack
+  static const gateOffsetY = -40.0; // how far below the snack stack
+  static const labelOffsetY = -25; // how far below the snack stack
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
