@@ -54,16 +54,18 @@ class VendingMachinePage extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Card(
-                              margin: EdgeInsets.all(4.0),
-                              color: const Color.fromARGB(255, 243, 210, 196),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SnackView(),
+                            child: Center(
+                              child: Card(
+                                margin: const EdgeInsets.all(4.0),
+                                color: const Color.fromARGB(255, 243, 210, 196),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: SnackView(),
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(width: 300, child: ControlPad()),
+                          const SizedBox(width: 300, child: ControlPad()),
                         ],
                       ),
                     ),

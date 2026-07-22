@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
@@ -9,17 +8,31 @@ import 'package:snackautomat_bene_alex/front_layer/widgets/vending_display.dart'
 class SnackView extends ConsumerWidget {
   const SnackView({super.key});
 
+  // fixed size for grid + background — tweak these
+  static const gridW = 900.0;
+  static const gridH = 900.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Rahmen und Glasscheibe kommen hier drum
-    return VendingDisplay(
-      // damit der fallende Snack vor den anderen ist
-      child: Overlay(
-        initialEntries: [
-          OverlayEntry(
-            builder: (_) => const _SnackGrid(),
-          ),
-        ],
+    return SizedBox(
+      width: gridW,
+      height: gridH,
+      child: VendingDisplay(
+        child: Stack(
+          children: [
+            Image.asset(
+              'assets/images/decoration/Metallgitter.png',
+              width: gridW,
+              height: gridH,
+              fit: BoxFit.fill,
+            ),
+            Overlay(
+              initialEntries: [
+                OverlayEntry(builder: (_) => const _SnackGrid()),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -28,75 +41,77 @@ class SnackView extends ConsumerWidget {
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
 
-  // festes Raster: immer 4x4 Plätze
-  static const int columns = 4;
-  static const int rows = 4;
+  static const columns = 6;
+  static const rows = 4;
+
+  // fixed layout
+  static const startX = 43.0;
+  static const startY = 30.0;
+  static const slotW = 121.0;
+  static const slotH = 136.0;
+  static const snackSize = 90.0;
+  static const gateWidth = 100.0;
+  static const gateOffsetY = -40.0; // how far below the snack stack
+  static const labelOffsetY = -25; // how far below the snack stack
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // baut neu wenn sich ein Snack ändert
     final state = ref.watch(snackMachineProvider);
-    // damit weiß ich wieviel Platz das Raster hat
+
     return state.when(
-      loading: () => Placeholder(color: Colors.yellow),
-      error: (error, stackTrace) => Placeholder(
-        color: Colors.red,
-      ),
+      loading: () => const Placeholder(color: Colors.yellow),
+      error: (_, _) => const Placeholder(color: Colors.red),
       data: (state) {
         final slots = state.snackStorage;
-        print('Slots count: ${slots.length}');
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            // Abstände skalieren ein bischen mit
-            final rasterScale = (constraints.maxWidth / 1000).clamp(0.35, 2.0);
-            final spacing = 10 * rasterScale;
+        final selected = state.vendingState.selectedSlot;
+        final cellW = snackSize > gateWidth ? snackSize : gateWidth;
 
-            final cellWidth = max(
-              1.0,
-              (constraints.maxWidth - 2 * spacing - (columns - 1) * spacing) /
-                  columns,
-            );
-
-            final cellHeight = max(
-              1.0,
-              (constraints.maxHeight - 2 * spacing - (rows - 1) * spacing - 1) /
-                  rows,
-            );
-
-            final selected = state.vendingState.selectedSlot;
-            return GridView.builder(
-              // sollte alles reinpassen, scrollen ist also aus
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(spacing),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: columns,
-                crossAxisSpacing: spacing,
-                mainAxisSpacing: spacing,
-                childAspectRatio: max(cellWidth / cellHeight, 0.5),
-              ),
-              // immer alle 16 Zellen, auch wenn weniger Snacks da sind
-              itemCount: columns * rows,
-              itemBuilder: (context, index) {
-                // leere Plätze bleiben einfach frei
-                if (index >= slots.length) {
-                  return const SizedBox.shrink();
-                }
-
-                final slot = slots[index];
-                final stackWidget = SnackStackWidget(
-                  stack: slot,
+        return Stack(
+          children: [
+            for (var i = 0; i < columns * rows && i < slots.length; i++) ...[
+              Positioned(
+                left: startX + (i % columns) * slotW + (slotW - cellW) / 2,
+                top: startY + (i ~/ columns) * slotH,
+                width: cellW,
+                height: slotH,
+                child: SnackStackWidget(
+                  stack: slots[i],
+                  snackSize: snackSize,
+                  gateWidth: gateWidth,
+                  gateOffsetY: gateOffsetY,
+                  // left 3 cols lean right, right 3 lean left; stronger farther outfrom the middle
+                  stackBias:
+                      ((columns - 1) / 2 - (i % columns)) / ((columns - 1) / 3),
                   dispense:
-                      state.vendingState is DispenseSnackState &&
-                      selected == index,
+                      state.vendingState is DispenseSnackState && selected == i,
                   onAnimationFinished: () =>
                       ref.read(snackMachineProvider.notifier).onFinished(),
-                );
-
-                // skaliert den ganzen Snack und nicht nur das Bild
-                return FittedBox(fit: BoxFit.contain, child: stackWidget);
-              },
-            );
-          },
+                ),
+              ),
+              Positioned(
+                left: startX + (i % columns) * slotW,
+                top: startY + (i ~/ columns) * slotH + slotH + labelOffsetY,
+                width: slotW,
+                child: Text(
+                  i.toString().padLeft(3, '0'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'FixedSys',
+                    fontSize: 14,
+                    height: 1,
+                    letterSpacing: 2,
+                    color: const Color(0xFFFFBF00).withValues(alpha: 0.95),
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.8),
+                        offset: const Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
         );
       },
     );

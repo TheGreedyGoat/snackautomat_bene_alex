@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'backgrounds_overlays/glass_pane.dart';
 
-///Swingable glass door with hinges on the left
+/// Glass door that can swing open. Hinges are on the left.
 class VendingDisplay extends StatefulWidget {
   final Widget child;
 
@@ -22,7 +22,7 @@ class _VendingDisplayState extends State<VendingDisplay>
     duration: const Duration(milliseconds: 1100),
   );
 
-  // tilt 110 degree
+  // door opens about 110 degrees
   late final Animation<double> _angle = Tween(begin: 0.0, end: 1.9).animate(
     CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
   );
@@ -98,6 +98,7 @@ class _VendingDisplayState extends State<VendingDisplay>
   }
 }
 
+/// The glass part of the door, with some extra layers for fake thickness
 class _GlassDoor extends StatelessWidget {
   final bool showThickness;
 
@@ -118,7 +119,6 @@ class _GlassDoor extends StatelessWidget {
                 ..translateByDouble(0, 0, i * _thickness / _layers, 1),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  // no face fill — stacked translucent whites turn milky
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.07),
                     width: 1,

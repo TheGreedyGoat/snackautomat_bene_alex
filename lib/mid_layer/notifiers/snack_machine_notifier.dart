@@ -18,7 +18,7 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ma
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-final snacks = [
+final _snackTypes = [
   const Snack(
     name: 'Nuka Cola',
     price: 120,
@@ -66,11 +66,10 @@ final snacks = [
   ),
 ];
 
-/// Placeholder snacks: 16 slots for the 4x4 grid,
-/// the 4 types just repeat until all slots are filled
-// final snacks = [
-//   for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
-// ];
+/// 24 slots for the 6x4 metal grid — snack types repeat to fill all slots
+final snacks = [
+  for (int i = 0; i < 24; i++) _snackTypes[i % _snackTypes.length],
+];
 
 /// The core logical unit of the state machine.
 ///
