@@ -26,8 +26,10 @@ class CoinSlit extends StatelessWidget {
         ],
       ),
       child: Rusty(
-        color: Colors.black,
-        borderRadius: 10.0,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         child: SizedBox.square(
           dimension: 70,
           child: Padding(
@@ -35,8 +37,10 @@ class CoinSlit extends StatelessWidget {
             child: GestureDetector(
               onTap: () {},
               child: Rusty(
-                color: Colors.grey,
-                boxShape: BoxShape.circle,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  shape: BoxShape.circle,
+                ),
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -58,7 +62,7 @@ class CoinSlit extends StatelessWidget {
                               offset: Offset(1, 1),
                             ),
                           ],
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          borderRadius: BorderRadius.all(Radius.circular(1)),
                         ),
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/auto_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/manual/idle_state.dart';
@@ -12,8 +13,7 @@ class DispenseSnackState extends AutoState {
     required super.credit,
     required super.selectedSlot,
     super.displayMessage = 'Warenausgabe...',
-    super.hasError,
-  }) {
+  }) : super(mode: LcdMessageMode.normal) {
     assert(selectedSlot != null);
   }
 

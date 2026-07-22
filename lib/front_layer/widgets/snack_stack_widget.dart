@@ -155,7 +155,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
           animation: controller,
           child: ThickSnackCard(
             snack: widget.stack.snack,
-            index: 0,
+            index: widget.stack.snackID,
           ),
           builder: (_, child) {
             return Positioned(
@@ -221,7 +221,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                     opacity: (i == 0 && removing) ? 0 : 1,
                     child: SnackCard(
                       snack: widget.stack.snack,
-                      index: i,
+                      index: widget.stack.snackID,
                     ),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:my_utils/utility/money_converter.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 
@@ -18,8 +19,7 @@ abstract class VendingState {
   /// A message to display information to the user
   final String displayMessage;
 
-  /// true, if the last state transistion was caused by some kind of error (eg snack not available)
-  final bool hasError;
+  final LcdMessageMode mode;
 
   /// The state of the vending machine's numberpad
   final NumberPadState numberPadState;
@@ -32,8 +32,8 @@ abstract class VendingState {
     required this.acceptsInput,
     required this.displayMessage,
     required this.numberPadState,
+    this.mode = LcdMessageMode.normal,
     this.selectedSlot,
-    this.hasError = false,
   });
 
   /// Returns the state to transition to when a coin ist inserted

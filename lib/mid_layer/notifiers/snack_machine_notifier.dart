@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
@@ -18,27 +19,52 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ve
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
 // TODO: Switch to Fallout items
-/// The available snack types (4 unique ones)
-const _snackTypes = [
-  Snack(
-    name: 'Twix',
+/// Placeholder snacks
+final snacks = [
+  const Snack(
+    name: 'Nuka Cola',
     price: 120,
-    image: 'assets/images/Twix.png',
+    image: 'assets/images/nuka_classic.png',
   ),
-  Snack(
-    name: 'Rafaelo',
+  const Snack(
+    name: 'Nuka Cola Dark',
+    price: 120,
+    image: 'assets/images/nuka_dark.png',
+  ),
+  const Snack(
+    name: 'Nuka Cola Orange',
+    price: 120,
+    image: 'assets/images/nuka_orange.png',
+  ),
+  const Snack(
+    name: 'Nuka Cola Quantum',
     price: 223,
-    image: 'assets/images/Rafaelo.png',
+    image: 'assets/images/nuka_quantum.png',
   ),
-  Snack(
-    name: 'Pringles',
-    price: 300,
-    image: 'assets/images/Pringles.png',
+  const Snack(
+    name: 'Nuka Cherry',
+    price: 120,
+    image: 'assets/images/nuka_cherry.png',
   ),
-  Snack(
-    name: 'Milka Oreo',
+  const Snack(
+    name: 'Rad Away',
     price: 300,
-    image: 'assets/images/MilkaOreo.png',
+    image: 'assets/images/rad_away.png',
+  ),
+  const Snack(
+    name: 'BlamCo Mac & Cheese',
+    price: 300,
+    image: 'assets/images/blamco.png',
+  ),
+  const Snack(
+    name: 'Cram',
+    price: 300,
+    image: 'assets/images/cram.png',
+  ),
+  const Snack(
+    name: 'Sugar Bombs',
+    price: 300,
+    image: 'assets/images/sugar_bombs.png',
   ),
 ];
 
@@ -65,10 +91,12 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     print(coinStorage);
     var change = (await _dbService.getCoinStack(_coinChangeID, true))!;
     var snackStorage = await _dbService.getSnackStacks();
-    //fill missing slots
-    if (snackStorage.length < snacks.length) {
-      for (int i = snackStorage.length; i < snacks.length; i++) {
-        await _dbService.insertSnackStack(SnackStack(snackID: i, count: 5));
+
+    for (int i = 0; i < snacks.length; i++) {
+      if (i >= snackStorage.length) {
+        final stack = SnackStack(snackID: i, count: 5);
+        await _dbService.insertSnackStack(stack);
+        snackStorage.add(stack);
       }
       snackStorage = await _dbService.getSnackStacks();
     }
@@ -77,6 +105,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
           (_) => _defaultAutoTimer,
         )
         .toList(growable: false);
+
     var vendingState = await _dbService.vendingState;
     if (!coinStorage.canReturnAmount(vendingState.credit)) {
       vendingState = IdleState(numberPadState: NumberPadState.init());
@@ -180,7 +209,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
             _vendingState is! IdleState &&
             _vendingState is! ErrorState) {
           _resetTimer = Timer(
-            Duration(seconds: 5),
+            Duration(seconds: 30),
             _reset,
           );
         } else if (_vendingState is ReturnCoinsState) {
@@ -233,7 +262,7 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
       _vendingState = NoSelectionState(
         credit: _vendingState.credit,
         displayMessage: 'Rückgeld nicht möglich',
-        hasError: true,
+        mode: LcdMessageMode.warning,
         numberPadState: NumberPadState.init(),
       );
     }

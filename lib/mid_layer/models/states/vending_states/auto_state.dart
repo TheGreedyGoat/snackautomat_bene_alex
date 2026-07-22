@@ -10,7 +10,7 @@ abstract class AutoState extends VendingState {
     required super.credit,
     required super.displayMessage,
     super.selectedSlot,
-    super.hasError,
+    super.mode,
   }) : super(acceptsInput: false, numberPadState: NumberPadState.init());
 
   @override

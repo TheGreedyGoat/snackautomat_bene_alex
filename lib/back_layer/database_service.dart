@@ -171,7 +171,7 @@ class DataBaseService {
       );
       stacks.add(SnackStack(snackID: snackID as int, count: count as int));
     }
-    return stacks.toList(growable: false);
+    return stacks.toList();
   }
 
   /// prints the whole table of all saved CoinStacks

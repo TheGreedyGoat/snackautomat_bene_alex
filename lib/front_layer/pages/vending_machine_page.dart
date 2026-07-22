@@ -21,13 +21,14 @@ class VendingMachinePage extends StatelessWidget {
           children: [
             Expanded(
               child: RustyRoundedBox(
-                color: Color(0xffBA1724),
+                deocration: BoxDecoration(
+                  color: Color(0xffBA1724),
+                ),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Expanded(child: InventoryOverview()),
                         SizedBox.square(
                           dimension: 200,
                           child: Container(

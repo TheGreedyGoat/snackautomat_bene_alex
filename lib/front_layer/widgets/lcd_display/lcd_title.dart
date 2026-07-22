@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_text.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_separation_line.dart';
 
@@ -13,7 +14,7 @@ class LcdTitle extends StatefulWidget {
   const LcdTitle(
     this.data, {
     this.scroll = true,
-    this.hasError = false,
+    this.mode = LcdMessageMode.normal,
     super.key,
   });
 
@@ -23,8 +24,7 @@ class LcdTitle extends StatefulWidget {
   /// set to true to make the title scrolling
   final bool scroll;
 
-  /// set to true to change color from green to red
-  final bool hasError;
+  final LcdMessageMode mode;
 
   @override
   State<LcdTitle> createState() => _LcdTitleState();
@@ -67,13 +67,13 @@ class _LcdTitleState extends State<LcdTitle> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        LcdSeparationLine(),
+        LcdSeparationLine(mode: widget.mode),
         LcdText(
           title,
           fontSize: 25.0,
-          hasError: widget.hasError,
+          mode: widget.mode,
         ),
-        LcdSeparationLine(),
+        LcdSeparationLine(mode: widget.mode),
       ],
     );
   }

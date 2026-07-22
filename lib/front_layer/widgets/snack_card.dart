@@ -63,14 +63,16 @@ class SnackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(index);
     return Card(
       elevation: 20,
-      color: Color.fromARGB(
-        255,
-        255 - index * 10,
-        191 - index * 10,
-        0,
-      ),
+      // color: Colors.red,
+      // Color.fromARGB(
+      //   255,
+      //   255 - index * 10,
+      //   191 - index * 10,
+      //   0,
+      // ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -91,7 +93,7 @@ class SnackCard extends StatelessWidget {
               left: 0,
               right: 0,
               child: Container(
-                color: const Color.fromARGB(90, 0, 0, 0),
+                color: const Color.fromARGB(200, 0, 0, 0),
                 padding: const EdgeInsets.symmetric(
                   vertical: 4,
                 ),
@@ -105,11 +107,17 @@ class SnackCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      MoneyConverter.centsToEutoDisplay(snack.price),
-                      style: const TextStyle(
-                        color: Colors.white,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(index.toString().padLeft(3, '0')),
+                        Text(
+                          MoneyConverter.centsToEutoDisplay(snack.price),
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
