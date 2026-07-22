@@ -425,15 +425,15 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     if (!maybeState.snackAvailable(index)) return;
     _dbService.updateSnackStackCount(index, stack.count - 1).then(
       (_) {
-        final storage = maybeState.snackStorage.toList();
-
-        storage[index] = stack!.copyWith(count: stack.count - 1);
-        state = AsyncData(
-          maybeState.copyWith(
+        state = state.whenData((current) {
+          final storage = current.snackStorage.toList();
+          final currentStack = storage[index];
+          storage[index] = currentStack.copyWith(count: currentStack.count - 1);
+          return current.copyWith(
             snackStorage: storage,
-            ejectedSnackIndex: stack.snackID,
-          ),
-        );
+            ejectedSnackIds: [...current.ejectedSnackIds, currentStack.snackID],
+          );
+        });
       },
     );
   }
@@ -447,14 +447,14 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     return change;
   }
 
-  /// removes the snack thats currently in the ejection slot and returns it.
-  Snack? emptyDispenseSlot() {
+  /// removes all snacks from the output bay and returns them
+  List<Snack> emptyDispenseSlot() {
     final maybeState = _tryFetchState();
-    if (maybeState == null) return null;
+    if (maybeState == null) return const [];
 
-    Snack? snack = maybeState.ejectedSnack;
-    state = AsyncData(maybeState.copyWith(ejectedSnackIndex: null));
-    return snack;
+    final taken = maybeState.ejectedSnacks;
+    state = AsyncData(maybeState.copyWith(ejectedSnackIds: const []));
+    return taken;
   }
 
   /// sets all snack stacks back to contain 5 snacks, minimum of 1

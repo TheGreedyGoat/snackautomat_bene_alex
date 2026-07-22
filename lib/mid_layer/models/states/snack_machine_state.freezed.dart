@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SnackMachineState {
 
- CoinStack get coinStorage; CoinStack get changeSlot; List<SnackStack> get snackStorage; int? get ejectedSnackIndex; VendingState get vendingState;
+ CoinStack get coinStorage; CoinStack get changeSlot; List<SnackStack> get snackStorage; List<int> get ejectedSnackIds; VendingState get vendingState;
 /// Create a copy of SnackMachineState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SnackMachineStateCopyWith<SnackMachineState> get copyWith => _$SnackMachineStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SnackMachineState&&(identical(other.coinStorage, coinStorage) || other.coinStorage == coinStorage)&&(identical(other.changeSlot, changeSlot) || other.changeSlot == changeSlot)&&const DeepCollectionEquality().equals(other.snackStorage, snackStorage)&&(identical(other.ejectedSnackIndex, ejectedSnackIndex) || other.ejectedSnackIndex == ejectedSnackIndex)&&(identical(other.vendingState, vendingState) || other.vendingState == vendingState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SnackMachineState&&(identical(other.coinStorage, coinStorage) || other.coinStorage == coinStorage)&&(identical(other.changeSlot, changeSlot) || other.changeSlot == changeSlot)&&const DeepCollectionEquality().equals(other.snackStorage, snackStorage)&&const DeepCollectionEquality().equals(other.ejectedSnackIds, ejectedSnackIds)&&(identical(other.vendingState, vendingState) || other.vendingState == vendingState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,coinStorage,changeSlot,const DeepCollectionEquality().hash(snackStorage),ejectedSnackIndex,vendingState);
+int get hashCode => Object.hash(runtimeType,coinStorage,changeSlot,const DeepCollectionEquality().hash(snackStorage),const DeepCollectionEquality().hash(ejectedSnackIds),vendingState);
 
 @override
 String toString() {
-  return 'SnackMachineState(coinStorage: $coinStorage, changeSlot: $changeSlot, snackStorage: $snackStorage, ejectedSnackIndex: $ejectedSnackIndex, vendingState: $vendingState)';
+  return 'SnackMachineState(coinStorage: $coinStorage, changeSlot: $changeSlot, snackStorage: $snackStorage, ejectedSnackIds: $ejectedSnackIds, vendingState: $vendingState)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SnackMachineStateCopyWith<$Res>  {
   factory $SnackMachineStateCopyWith(SnackMachineState value, $Res Function(SnackMachineState) _then) = _$SnackMachineStateCopyWithImpl;
 @useResult
 $Res call({
- CoinStack coinStorage, CoinStack changeSlot, List<SnackStack> snackStorage, int? ejectedSnackIndex, VendingState vendingState
+ CoinStack coinStorage, CoinStack changeSlot, List<SnackStack> snackStorage, List<int> ejectedSnackIds, VendingState vendingState
 });
 
 
@@ -62,13 +62,13 @@ class _$SnackMachineStateCopyWithImpl<$Res>
 
 /// Create a copy of SnackMachineState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? coinStorage = null,Object? changeSlot = null,Object? snackStorage = null,Object? ejectedSnackIndex = freezed,Object? vendingState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? coinStorage = null,Object? changeSlot = null,Object? snackStorage = null,Object? ejectedSnackIds = null,Object? vendingState = null,}) {
   return _then(SnackMachineState(
 coinStorage: null == coinStorage ? _self.coinStorage : coinStorage // ignore: cast_nullable_to_non_nullable
 as CoinStack,changeSlot: null == changeSlot ? _self.changeSlot : changeSlot // ignore: cast_nullable_to_non_nullable
 as CoinStack,snackStorage: null == snackStorage ? _self.snackStorage : snackStorage // ignore: cast_nullable_to_non_nullable
-as List<SnackStack>,ejectedSnackIndex: freezed == ejectedSnackIndex ? _self.ejectedSnackIndex : ejectedSnackIndex // ignore: cast_nullable_to_non_nullable
-as int?,vendingState: null == vendingState ? _self.vendingState : vendingState // ignore: cast_nullable_to_non_nullable
+as List<SnackStack>,ejectedSnackIds: null == ejectedSnackIds ? _self.ejectedSnackIds : ejectedSnackIds // ignore: cast_nullable_to_non_nullable
+as List<int>,vendingState: null == vendingState ? _self.vendingState : vendingState // ignore: cast_nullable_to_non_nullable
 as VendingState,
   ));
 }
