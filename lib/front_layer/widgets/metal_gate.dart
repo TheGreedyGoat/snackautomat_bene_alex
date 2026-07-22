@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Small metal bar under each snack.
-/// open = 0 means closed, open = 1 means flipped up.
+/// open = 0 means closed, open = 1 means flipped up
 class MetalGate extends StatelessWidget {
   final double open;
 
@@ -42,7 +42,10 @@ class MetalGate extends StatelessWidget {
                     ],
                     stops: [0.0, 0.35, 0.7, 1.0],
                   ),
-                  border: Border.all(color: const Color(0xFF2A2A2A), width: 1.2),
+                  border: Border.all(
+                    color: const Color(0xFF2A2A2A),
+                    width: 1.2,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.55),

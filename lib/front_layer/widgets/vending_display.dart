@@ -98,7 +98,7 @@ class _VendingDisplayState extends State<VendingDisplay>
   }
 }
 
-/// The glass part of the door. Extra layers fake some thickness.
+/// The glass part of the door, with some extra layers for fake thickness
 class _GlassDoor extends StatelessWidget {
   final bool showThickness;
 
@@ -119,8 +119,6 @@ class _GlassDoor extends StatelessWidget {
                 ..translateByDouble(0, 0, i * _thickness / _layers, 1),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  // only draw the border, not a white fill
-                  // (fill would look milky when layers stack)
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.07),
                     width: 1,

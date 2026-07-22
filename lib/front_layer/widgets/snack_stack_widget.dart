@@ -9,13 +9,21 @@ import 'snack_card.dart';
 class SnackStackWidget extends StatefulWidget {
   final SnackStack stack;
   final bool dispense;
+  final double snackSize;
   final double gateWidth;
+  final double gateOffsetY;
+
+  /// -1 = stack up-left, +1 = stack up-right. Stronger = farther from center.
+  final double stackBias;
   final void Function() onAnimationFinished;
   const SnackStackWidget({
     super.key,
     required this.stack,
+    required this.snackSize,
     required this.gateWidth,
     required this.onAnimationFinished,
+    this.gateOffsetY = 0,
+    this.stackBias = 1,
     this.dispense = false,
   });
 
@@ -218,10 +226,10 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
           children: [
             Expanded(
               child: Align(
-                alignment: Alignment.topCenter,
-                // move the snacks a bit down
-                child: FractionalTranslation(
-                  translation: const Offset(0, 0.5),
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: widget.snackSize,
+                  height: widget.snackSize,
                   child: FittedBox(
                     fit: BoxFit.contain,
                     child: SizedBox(
@@ -236,7 +244,13 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeOut,
                               bottom: i * 6.3,
-                              left: i * 2,
+                              // left half stacks up-left, right half up-right
+                              left: widget.stackBias >= 0
+                                  ? i * 2.0 * widget.stackBias.abs()
+                                  : null,
+                              right: widget.stackBias < 0
+                                  ? i * 2.0 * widget.stackBias.abs()
+                                  : null,
                               child: Opacity(
                                 opacity: (i == 0 && removing) ? 0 : 1,
                                 child: SnackCard(
@@ -253,15 +267,18 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
               ),
             ),
             Center(
-              child: SizedBox(
-                width: widget.gateWidth,
-                child: AnimatedBuilder(
-                  animation: gateController,
-                  builder: (context, child) {
-                    return MetalGate(
-                      open: Curves.easeInOut.transform(gateController.value),
-                    );
-                  },
+              child: Transform.translate(
+                offset: Offset(0, widget.gateOffsetY),
+                child: SizedBox(
+                  width: widget.gateWidth,
+                  child: AnimatedBuilder(
+                    animation: gateController,
+                    builder: (context, child) {
+                      return MetalGate(
+                        open: Curves.easeInOut.transform(gateController.value),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
