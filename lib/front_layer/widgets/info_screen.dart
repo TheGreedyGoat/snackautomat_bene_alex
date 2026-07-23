@@ -53,14 +53,8 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 LcdTitle(title),
-                // Column(
-                //   mainAxisAlignment: MainAxisAlignment.start,
-                //   children: [
-                //     // LcdText(state.vendingState.credit.toString()),
-                //   ],
-                // ),
+                LcdText('${state.vendingState.runtimeType}'),
                 Row(
-                  // mainAxisAlignment: MainAxisAlignment.s,
                   children: [
                     const NukaColaAscii(
                       fontSize: 13,
@@ -88,6 +82,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                       children: [
                         LcdText('AUSWAHL: ${state.numberPadState}'),
                         LcdText(selectedSlot?.snackName ?? '...'),
+                        LcdText('STK: ${selectedSlot?.count ?? '---'}'),
                       ],
                     ),
                     Row(

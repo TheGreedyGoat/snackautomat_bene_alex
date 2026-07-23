@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SnackStack {
 
- int get snackID; int get count;
+ int get id; int? get snackIndex; int get count;
 /// Create a copy of SnackStack
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SnackStackCopyWith<SnackStack> get copyWith => _$SnackStackCopyWithImpl<SnackSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SnackStack&&(identical(other.snackID, snackID) || other.snackID == snackID)&&(identical(other.count, count) || other.count == count));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SnackStack&&(identical(other.id, id) || other.id == id)&&(identical(other.snackIndex, snackIndex) || other.snackIndex == snackIndex)&&(identical(other.count, count) || other.count == count));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,snackID,count);
+int get hashCode => Object.hash(runtimeType,id,snackIndex,count);
 
 @override
 String toString() {
-  return 'SnackStack(snackID: $snackID, count: $count)';
+  return 'SnackStack(id: $id, snackIndex: $snackIndex, count: $count)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SnackStackCopyWith<$Res>  {
   factory $SnackStackCopyWith(SnackStack value, $Res Function(SnackStack) _then) = _$SnackStackCopyWithImpl;
 @useResult
 $Res call({
- int snackID, int count
+ int? snackIndex, int count, int id
 });
 
 
@@ -62,10 +62,11 @@ class _$SnackStackCopyWithImpl<$Res>
 
 /// Create a copy of SnackStack
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? snackID = null,Object? count = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? snackIndex = freezed,Object? count = null,Object? id = null,}) {
   return _then(SnackStack(
-snackID: null == snackID ? _self.snackID : snackID // ignore: cast_nullable_to_non_nullable
-as int,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+snackIndex: freezed == snackIndex ? _self.snackIndex : snackIndex // ignore: cast_nullable_to_non_nullable
+as int?,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

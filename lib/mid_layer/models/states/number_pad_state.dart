@@ -25,9 +25,7 @@ class NumberPadState with _$NumberPadState {
   /// example:
   /// digit0 = 1, digit1 = 2; digit2 = 3
   /// => value = 321;
-  NumberPadState({this.digit0, this.digit1, this.digit2}) {
-    print(this);
-  }
+  NumberPadState({this.digit0, this.digit1, this.digit2});
 
   /// Stores wich digits are currently entered via the numberpad.
   NumberPadState.init() : this();

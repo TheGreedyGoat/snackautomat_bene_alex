@@ -12,7 +12,7 @@ class ErrorState extends ManualState {
     required super.credit,
     required super.numberPadState,
     super.displayMessage = 'ERROR',
-  }) : super(mode: LcdMessageMode.error);
+  }) : super(mode: LcdMessageMode.error, autoReset: true);
 
   @override
   VendingState onCoinInserted(Coin coin) => ErrorState(

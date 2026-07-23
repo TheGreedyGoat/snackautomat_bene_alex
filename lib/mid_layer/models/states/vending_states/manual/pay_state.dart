@@ -17,7 +17,7 @@ class PayState extends ManualState {
     required super.numberPadState,
     super.displayMessage = 'Bitte bezahlen',
     super.mode,
-  });
+  }) : super(autoReset: true);
 
   @override
   VendingState onCoinInserted(Coin coin) {

@@ -28,8 +28,8 @@ class SnackView extends ConsumerWidget {
 class _SnackGrid extends ConsumerWidget {
   const _SnackGrid();
 
-  // festes Raster: immer 4x4 Plätze
-  static const int columns = 4;
+  // festes Raster: immer 4x6 Plätze
+  static const int columns = 6;
   static const int rows = 4;
 
   @override
@@ -44,7 +44,6 @@ class _SnackGrid extends ConsumerWidget {
       ),
       data: (state) {
         final slots = state.snackStorage;
-        print('Slots count: ${slots.length}');
         return LayoutBuilder(
           builder: (context, constraints) {
             // Abstände skalieren ein bischen mit
@@ -74,7 +73,7 @@ class _SnackGrid extends ConsumerWidget {
                 mainAxisSpacing: spacing,
                 childAspectRatio: max(cellWidth / cellHeight, 0.5),
               ),
-              // immer alle 16 Zellen, auch wenn weniger Snacks da sind
+              // immer alle 24 Zellen, auch wenn weniger Snacks da sind
               itemCount: columns * rows,
               itemBuilder: (context, index) {
                 // leere Plätze bleiben einfach frei
@@ -82,12 +81,9 @@ class _SnackGrid extends ConsumerWidget {
                   return const SizedBox.shrink();
                 }
 
-                final slot = slots[index];
+                // final slot = slots[index];
                 final stackWidget = SnackStackWidget(
-                  stack: slot,
-                  dispense:
-                      state.vendingState is DispenseSnackState &&
-                      selected == index,
+                  stackId: index,
                   onAnimationFinished: () =>
                       ref.read(snackMachineProvider.notifier).onFinished(),
                 );

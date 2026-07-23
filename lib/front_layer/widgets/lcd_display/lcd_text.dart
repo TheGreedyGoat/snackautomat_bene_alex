@@ -18,12 +18,17 @@ class LcdText extends StatelessWidget {
     this.data, {
     this.fontSize = 20,
     this.mode = LcdMessageMode.normal,
+    this.maxLines = 1,
+    this.overflow,
     super.key,
   });
 
   /// The text's content
   final String data;
   final LcdMessageMode mode;
+
+  final TextOverflow? overflow;
+  final int maxLines;
 
   /// The fontSize to display the text in (default: 20p)
   final double fontSize;
@@ -37,9 +42,9 @@ class LcdText extends StatelessWidget {
         fontFamily: 'FixedSys',
         fontSize: fontSize,
       ),
-      overflow: TextOverflow.clip,
+      overflow: overflow,
       softWrap: false,
-      maxLines: 1,
+      maxLines: maxLines,
     );
   }
 }

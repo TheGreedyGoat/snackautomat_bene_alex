@@ -47,4 +47,7 @@ abstract class VendingState {
 
   /// returns the current credit as a formatted € -String
   String get creditDisplay => MoneyConverter.centsToEutoDisplay(credit);
+
+  @override
+  String toString() => '$credit, $selectedSlot';
 }

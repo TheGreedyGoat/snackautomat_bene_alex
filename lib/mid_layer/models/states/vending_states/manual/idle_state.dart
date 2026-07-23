@@ -10,7 +10,7 @@ class IdleState extends ManualState {
     super.displayMessage = 'Willkommen!',
     required super.numberPadState,
     super.mode,
-  }) : super(credit: 0, selectedSlot: null);
+  }) : super(credit: 0, selectedSlot: null, autoReset: false);
 
   @override
   VendingState onCoinInserted(Coin coin) {

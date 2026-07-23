@@ -10,7 +10,7 @@ class NoSelectionState extends ManualState {
     required super.numberPadState,
     super.displayMessage = 'Bitte wählen Sie',
     super.mode,
-  });
+  }) : super(autoReset: true);
 
   @override
   VendingState onCoinInserted(Coin coin) {

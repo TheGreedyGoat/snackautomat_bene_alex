@@ -9,29 +9,41 @@ part 'snack_stack.freezed.dart';
 @freezed
 class SnackStack with _$SnackStack {
   @override
-  final int snackID;
+  final int id;
+
+  /// The index of the contained snack within the [snacks] list
+  @override
+  final int? snackIndex;
   @override
   /// The number of snacks contained in this slot.
   final int count;
 
   /// A slot for the vending machine that contains a certain amountof the same snack.
-  SnackStack({required this.snackID, required this.count});
+  SnackStack({
+    required this.snackIndex,
+    required this.count,
+    required this.id,
+  });
 
   /// The contained snack's type
-  Snack get snack => snacks[snackID];
+  Snack? get snack => snackIndex != null ? snacks[snackIndex!] : null;
 
   ///
-  String get snackName => snack.name;
+  String? get snackName => snack?.name ?? 'LEER';
 
   ///
-  int get snackPrice => snack.price;
+  int get snackPrice => snack?.price ?? -1;
 
   /// Display String for the snack's price
   String get priceDisplay => MoneyConverter.centsToEutoDisplay(snackPrice);
 
   /// returns if the slot is empty
-  bool get isEmpty => count <= 0;
+  bool get isEmpty => snackIndex == null || count <= 0;
 
   /// returns if the slot is not empty
   bool get isNotEmpty => !isEmpty;
+
+  @override
+  String toString() =>
+      '{Snack stack $id, snackIndex: $snackIndex, count: $count}';
 }

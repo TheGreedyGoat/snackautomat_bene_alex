@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:my_utils/utility/money_converter.dart';
+import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifier.dart';
 
 import '../../mid_layer/models/snack.dart';
 
 //Fake 3D thickness effect for the snack card
 class ThickSnackCard extends StatelessWidget {
-  final Snack snack;
-  final int index;
+  final int snackIndex;
   final double thickness;
   final int layers;
 
   const ThickSnackCard({
     super.key,
-    required this.snack,
-    required this.index,
+    required this.snackIndex,
     this.thickness = 24,
     this.layers = 14,
   });
@@ -22,8 +21,8 @@ class ThickSnackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseColor = Color.fromARGB(
       255,
-      255 - index * 10,
-      191 - index * 10,
+      255 - snackIndex * 10,
+      191 - snackIndex * 10,
       0,
     );
     final edgeColor = Color.lerp(baseColor, Colors.black, 0.45)!;
@@ -45,25 +44,31 @@ class ThickSnackCard extends StatelessWidget {
               ),
             ),
           ),
-        SnackCard(snack: snack, index: index),
+        SnackCard(
+          snackIndex: snackIndex,
+          showPriceAndCode: false,
+        ),
       ],
     );
   }
 }
 
 class SnackCard extends StatelessWidget {
-  final Snack snack;
-  final int index;
+  final int snackIndex;
+  final int? slotID;
+  final bool showPriceAndCode;
 
   const SnackCard({
     super.key,
-    required this.snack,
-    required this.index,
+    required this.snackIndex,
+    this.slotID,
+    this.showPriceAndCode = true,
   });
+
+  Snack get snack => snacks[snackIndex];
 
   @override
   Widget build(BuildContext context) {
-    print(index);
     return Card(
       elevation: 20,
       // color: Colors.red,
@@ -107,18 +112,19 @@ class SnackCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(index.toString().padLeft(3, '0')),
-                        Text(
-                          MoneyConverter.centsToEutoDisplay(snack.price),
-                          style: const TextStyle(
-                            color: Colors.white,
+                    if (showPriceAndCode && slotID != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(slotID.toString().padLeft(3, '0')),
+                          Text(
+                            MoneyConverter.centsToEutoDisplay(snack.price),
+                            style: const TextStyle(
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                   ],
                 ),
               ),

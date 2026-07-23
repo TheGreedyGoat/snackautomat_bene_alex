@@ -10,6 +10,8 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ma
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:sqflite/sqflite.dart';
 
+const snackSlotCount = 24;
+
 /// Singleton to communicate with the database.
 ///
 /// No public constructor -> access via [instance]
@@ -23,6 +25,9 @@ class DataBaseService {
     _vendingStateTypeColumnName: 'IdleState',
     _vendingStateSelectedSlotColumnName: null,
     _vendingStateCreditColumnName: 0,
+    _digit0ColumnName: 0,
+    _digit1ColumnName: 0,
+    _digit2ColumnName: 0,
   };
 
   static const _dataBaseName = 'vending_machine.db';
@@ -37,7 +42,8 @@ class DataBaseService {
   static const _digit2ColumnName = 'digit2';
 
   static const _snackStackTableName = 'SNACK_STACKS';
-  static const _snackStackIDColumnName = 'snack_id';
+  static const _snackStackIDColumnName = 'stack_id';
+  static const _snackStackTypeIndexColumnName = 'snack_index';
   static const _snackStackCountColumnName = 'snack_count';
 
   static const _coinEntryTableName = 'COIN_ENTRIES';
@@ -48,22 +54,20 @@ class DataBaseService {
 
   Future<Database> get _database async {
     _db ??= await _getDataBase();
-    // await deleteDatabase(_db!.path);
-
-    // _db = await getDataBase();
     return _db!;
   }
 
   /// deletes the whole database
   Future<void> removeDatabase() async {
-    await deleteDatabase((await _database).path);
+    final path = join(await getDatabasesPath(), _dataBaseName);
+    await deleteDatabase(path);
   }
 
   Future<Database> _getDataBase() async {
     final databaseDirPath = getDatabasesPath();
     final dataBasePath = join(await databaseDirPath, _dataBaseName);
 
-    final dataBase = await openDatabase(
+    final database = await openDatabase(
       dataBasePath,
       version: 1,
       onCreate: (db, version) async {
@@ -82,7 +86,8 @@ class DataBaseService {
         await db.execute('''
 
           CREATE TABLE $_snackStackTableName(
-            $_snackStackIDColumnName INT PRIMARY KEY,
+            $_snackStackIDColumnName INT NOT NULL PRIMARY KEY CHECK($_snackStackIDColumnName >= 0),
+            $_snackStackTypeIndexColumnName INT,
             $_snackStackCountColumnName INT NOT NULL CHECK($_snackStackCountColumnName >= 0)
           );
           ''');
@@ -95,10 +100,43 @@ class DataBaseService {
             $_coinEntryCountColumnName INT NOT NULL CHECK($_coinEntryCountColumnName >= 0)
           );
           ''');
+        await db.insert(_vendingStateTableName, _defaultVendingState);
+
+        for (int i = 0; i < snackSlotCount; i++) {
+          await db.insert(_snackStackTableName, {
+            _snackStackIDColumnName: i,
+            _snackStackTypeIndexColumnName: null,
+            _snackStackCountColumnName: 0,
+          });
+        }
+
+        for (int s = 0; s < 2; s++) {
+          for (int c = 0; c < Coin.values.length; c++) {
+            await db.insert(_coinEntryTableName, {
+              _coinEntryTypeColumnName: c,
+              _coinStackIDColumnName: s,
+              _coinEntryCountColumnName: 0,
+            });
+          }
+        }
       },
     );
+    return database;
+  }
 
-    return dataBase;
+  Future<void> showDataBase() async {
+    final db = await _database;
+    for (final table in [
+      _vendingStateTableName,
+      _snackStackTableName,
+      _coinEntryTableName,
+    ]) {
+      print('=========================================\n$table:\n');
+      final qu = await db.query(table);
+      for (final e in qu) {
+        print(e);
+      }
+    }
   }
 
   //                     dP
@@ -110,6 +148,8 @@ class DataBaseService {
   //      .88
   //  d8888P
   /// loads the currently saved vendingState
+  ///
+
   Future<VendingState> get vendingState async {
     final db = await _database;
     var stateList = await db.query(_vendingStateTableName);
@@ -155,7 +195,7 @@ class DataBaseService {
   }
 
   /// Returns a list off all saved SnackStacks
-  Future<List<SnackStack>> getSnackStacks() async {
+  Future<List<SnackStack>> get snackStacks async {
     final db = await _database;
     final jsonStacks = await db.query(
       _snackStackTableName,
@@ -163,13 +203,20 @@ class DataBaseService {
     );
     List<SnackStack> stacks = List.empty(growable: true);
     for (final json in jsonStacks) {
-      final snackID = json[_snackStackIDColumnName];
+      final stackID = json[_snackStackIDColumnName];
+      final snackIndex = json[_snackStackTypeIndexColumnName];
       final count = json[_snackStackCountColumnName];
       assert(
-        snackID != null && snackID is int && count != null && count is int,
-        '===DATABASE ERROR===\n\nInvalid values or types in snackstack tables:\n snackID: $snackID\n count: $count',
+        (snackIndex is int?) && count != null && count is int,
+        '===DATABASE ERROR===\n\nInvalid values or types in snackstack tables:\n snackID: $snackIndex\n count: $count',
       );
-      stacks.add(SnackStack(snackID: snackID as int, count: count as int));
+      stacks.add(
+        SnackStack(
+          id: stackID as int,
+          snackIndex: snackIndex as int?,
+          count: count as int,
+        ),
+      );
     }
     return stacks.toList();
   }
@@ -183,7 +230,7 @@ class DataBaseService {
   /// Returns the coinstack with the given [coinStackID] if it exists
   ///
   /// if not entry is found and [createOnMissing] is true, the entry is created with an empty coinstack
-  Future<CoinStack?> getCoinStack(int coinStackID, bool createOnMissing) async {
+  Future<CoinStack?> getCoinStack(int coinStackID) async {
     final db = await _database;
 
     var stackList = await db.query(
@@ -193,11 +240,7 @@ class DataBaseService {
     );
 
     if (stackList.isEmpty) {
-      if (createOnMissing) {
-        stackList = await insertCoinStack(coinStackID, CoinStack.empty());
-      } else {
-        return null;
-      }
+      return null;
     }
 
     Map<Coin, int> coins = {};
@@ -221,41 +264,10 @@ class DataBaseService {
     return CoinStack.withCoins(coins);
   }
 
-  // oo                                       dP
-  //                                          88
-  // dP 88d888b. .d8888b. .d8888b. 88d888b. d8888P
-  // 88 88'  `88 Y8ooooo. 88ooood8 88'  `88   88
-  // 88 88    88       88 88.  ... 88         88
-  // dP dP    dP `88888P' `88888P' dP         dP
-
-  /// inserts a new snackStack into the database
-  Future<void> insertSnackStack(SnackStack stack) async {
-    final db = await _database;
-    await db.insert(_snackStackTableName, {
-      _snackStackIDColumnName: stack.snackID,
-      _snackStackCountColumnName: stack.count,
-    });
-  }
-
-  /// inserts a new CoinStack into the database
-  Future<List<Map<String, Object?>>> insertCoinStack(
-    int id,
-    CoinStack coinstack,
-  ) async {
-    final db = await _database;
-    List<Map<String, Object?>> inserted = List.empty(growable: true);
-    for (final coin in Coin.values) {
-      final map = {
-        _coinStackIDColumnName: id,
-        _coinEntryTypeColumnName: coin.index,
-        _coinEntryCountColumnName: coinstack.getCoinCount(coin),
-      };
-      await db.insert(_coinEntryTableName, map);
-      inserted.add(map);
-      coinstack.getCoinCount(coin);
-    }
-    return inserted;
-  }
+  Future<CoinStack> get coinStorage async => (await getCoinStack(0))!;
+  set coinStorage(CoinStack newStack) => updateCoinstack(newStack, 0);
+  Future<CoinStack> get coinChange async => (await getCoinStack(1))!;
+  set coinChange(CoinStack newStack) => updateCoinstack(newStack, 1);
 
   //                         dP            dP
   //                         88            88
@@ -265,16 +277,65 @@ class DataBaseService {
   // `88888P' 88Y888P' `88888P8 `88888P8   dP   `88888P'
   //          88
   //          dP
+
+  Future<bool> _checkExist(
+    String table,
+    String where,
+    List<dynamic> whereArgs,
+  ) async {
+    try {
+      final db = await _database;
+      return (await db.query(
+        table,
+        where: where,
+        whereArgs: whereArgs,
+      )).isNotEmpty;
+    } on Exception catch (e) {
+      return false;
+    }
+  }
+
   /// Sets the count value for the given SNackStack [stackID] to [newCount]
   Future<void> updateSnackStackCount(int stackID, int newCount) async {
+    if (!(await _checkExist(
+      _snackStackTableName,
+      '$_snackStackIDColumnName = ?',
+      [stackID.toString()],
+    ))) {
+      return;
+    }
+
     final db = await _database;
     final map = {_snackStackCountColumnName: max(newCount, 0)};
+    int numchanges = await db.update(
+      _snackStackTableName,
+      map,
+      where: '$_snackStackIDColumnName = ?',
+      whereArgs: [stackID],
+    );
+  }
+
+  Future<bool> changeSnackStack(int stackID, int snackIndex, int count) async {
+    if (!(await _checkExist(
+      _snackStackTableName,
+      '$_snackStackIDColumnName = ?',
+      [stackID.toString()],
+    ))) {
+      return false;
+    }
+    final db = await _database;
+    final map = {
+      _snackStackTypeIndexColumnName: snackIndex,
+      _snackStackCountColumnName: count,
+    };
     await db.update(
       _snackStackTableName,
       map,
       where: '$_snackStackIDColumnName = ?',
       whereArgs: [stackID],
     );
+
+    return true;
   }
 
   /// Save the current vendingState
@@ -304,19 +365,16 @@ class DataBaseService {
       // print(
       //   'Updating coinstack $index, coin $coin, count: ${stack.getCoinCount(coin)}',
       // );
-      print(
-        await db.update(
-          _coinEntryTableName,
-          {
-            _coinEntryCountColumnName: stack.getCoinCount(coin),
-          },
-          where:
-              '$_coinStackIDColumnName = ? AND $_coinEntryTypeColumnName = ?',
-          whereArgs: [
-            coinStackIndex,
-            coin.index,
-          ],
-        ),
+      await db.update(
+        _coinEntryTableName,
+        {
+          _coinEntryCountColumnName: stack.getCoinCount(coin),
+        },
+        where: '$_coinStackIDColumnName = ? AND $_coinEntryTypeColumnName = ?',
+        whereArgs: [
+          coinStackIndex,
+          coin.index,
+        ],
       );
     }
   }
