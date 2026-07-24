@@ -90,6 +90,7 @@ class _SnackGrid extends ConsumerWidget {
                     final int? snackIndex = await showModalBottomSheet<int>(
                       context: context,
                       builder: (context) => SnackSelectionModal(),
+                      isScrollControlled: true,
                     );
                     if (snackIndex == null) return;
                     ref

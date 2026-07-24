@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/no_snack_card.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/snack_selection_modal.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
@@ -259,42 +260,27 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
                       key: stackKey,
                       width: 200,
                       height: 216,
-                      child: stack.snackIndex != null && stack.isNotEmpty
-                          ? Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                for (int i = snackCount - 1; i >= 0; i--)
-                                  AnimatedPositioned(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOut,
-                                    bottom: i * 6.3,
-                                    left: widget.stackBias >= 0
-                                        ? i * 2.0 * widget.stackBias.abs()
-                                        : null,
-                                    right: widget.stackBias < 0
-                                        ? i * 2.0 * widget.stackBias.abs()
-                                        : null,
-                                    child: Opacity(
-                                      opacity: (i == 0 && removing) ? 0 : 1,
-                                      child: SnackCard(
-                                        snackIndex: stack.snackIndex!,
-                                        slotID: widget.slotID,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            )
-                          : Card(
-                              child: SizedBox.square(
-                                dimension: 180,
-                                child: Rusty(
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueGrey,
-                                    borderRadius: BorderRadius.circular(10),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          _slotCard(
+                            snackCount,
+                            NoSnackCard(),
+                          ),
+                          if (stack.isNotEmpty)
+                            for (int i = snackCount - 1; i >= 0; i--)
+                              _slotCard(
+                                i,
+                                Opacity(
+                                  opacity: (i == 0 && removing) ? 0 : 1,
+                                  child: SnackCard(
+                                    snackIndex: stack.snackIndex!,
+                                    slotID: widget.slotID,
                                   ),
                                 ),
                               ),
-                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -318,49 +304,18 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
             ),
           ],
         );
-        //! MY
-        //     .setDispenseCallBack(stackID, removeSnack);
-        // return GestureDetector(
-        //   onTap: () async {
-        //     final int? snackIndex = await showModalBottomSheet<int>(
-        //       context: context,
-        //       builder: (context) => SnackSelectionModal(),
-        //     );
-        //     if (snackIndex == null) return;
-        //     ref
-        //         .read(snackMachineProvider.notifier)
-        //         .setSnackSlot(widget.stackID, snackIndex);
-        //   },
-        //   child: SizedBox(
-        //     key: stackKey,
-        //     width: 200,
-        //     height: 216,
-        //     child: stack.isNotEmpty
-        //         ? Stack(
-        //             clipBehavior: Clip.none,
-        //             children: [
-        //               for (int i = snackCount - 1; i >= 0; i--)
-        //                 AnimatedPositioned(
-        //                   duration: const Duration(milliseconds: 300),
-        //                   curve: Curves.easeOut,
-        //                   bottom: i * 6.3,
-        //                   left: i * 2,
-        //                   child: Opacity(
-        //                     opacity: (i == 0 && removing) ? 0 : 1,
-        //                     child: SnackCard(
-        //                       snackIndex: stack.snackIndex!,
-        //                       slotID: widget.stackID,
-        //                     ),
-        //                   ),
-        //                 ),
-        //             ],
-        //           )
-        //         : Card(
-        //             color: Colors.grey,
-        //           ),
-        //   ),
-        // );
       },
     );
   }
+
+  Widget _slotCard(int i, Widget child) => AnimatedPositioned(
+    duration: const Duration(
+      milliseconds: 300,
+    ),
+    curve: Curves.easeOut,
+    bottom: i * 6.3,
+    left: widget.stackBias >= 0 ? i * 2.0 * widget.stackBias.abs() : null,
+    right: widget.stackBias < 0 ? i * 2.0 * widget.stackBias.abs() : null,
+    child: child,
+  );
 }
