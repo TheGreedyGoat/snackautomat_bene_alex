@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/coin_purse.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/front_layer/widgets/info_screen.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/info_screen_2.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/inventory_overview.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/nuka_cola_sign.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty_rounded_box.dart';
@@ -43,9 +44,9 @@ class VendingMachinePage extends StatelessWidget {
                         Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(
-                              maxWidth: 500.0,
+                              maxWidth: 300.0,
                             ),
-                            child: InfoScreen(),
+                            child: InfoScreen2(),
                           ),
                         ),
                       ],
@@ -68,10 +69,6 @@ class VendingMachinePage extends StatelessWidget {
                           const SizedBox(width: 300, child: ControlPad()),
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 200,
-                      child: SnackDispense(),
                     ),
                   ],
                 ),

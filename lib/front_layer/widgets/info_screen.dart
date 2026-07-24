@@ -43,27 +43,22 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(snackMachineProvider);
     return LcdDisplay(
-      height: 300,
+      height: 200,
       child: state.when(
         data: (state) {
           final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
+          final selectedSnack = selectedSlot?.snack;
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 LcdTitle(title),
-                // Column(
-                //   mainAxisAlignment: MainAxisAlignment.start,
-                //   children: [
-                //     // LcdText(state.vendingState.credit.toString()),
-                //   ],
-                // ),
+                // LcdText('${state.vendingState.runtimeType}'),
                 Row(
-                  // mainAxisAlignment: MainAxisAlignment.s,
                   children: [
                     const NukaColaAscii(
-                      fontSize: 13,
+                      fontSize: 10,
                     ),
                     Expanded(
                       child: Row(
@@ -88,6 +83,7 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
                       children: [
                         LcdText('AUSWAHL: ${state.numberPadState}'),
                         LcdText(selectedSlot?.snackName ?? '...'),
+                        LcdText('STK: ${selectedSlot?.count ?? '---'}'),
                       ],
                     ),
                     Row(

@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
-import 'package:snackautomat_bene_alex/front_layer/widgets/lcd_display/lcd_message_mode.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/coin_stack.dart';
-import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/number_pad_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/snack_machine_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/auto_state.dart';
@@ -80,33 +78,17 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
   DataBaseService get _dbService => DataBaseService.instance;
 
   late final List<Future<void> Function()> _dispenseAnimationCallbacks;
+  bool _animationRunning = false;
 
   @override
   Future<SnackMachineState> build() async {
-    await _dbService.showSnackStacks();
-    var coinStorage = (await _dbService.getCoinStack(_coinStorageID, true))!;
-    print(coinStorage);
-    var change = (await _dbService.getCoinStack(_coinChangeID, true))!;
-    var snackStorage = await _dbService.getSnackStacks();
-
-    for (int i = 0; i < snacks.length; i++) {
-      if (i >= snackStorage.length) {
-        final stack = SnackStack(snackID: i, count: 5);
-        await _dbService.insertSnackStack(stack);
-        snackStorage.add(stack);
-      }
-      snackStorage = await _dbService.getSnackStacks();
-    }
-    _dispenseAnimationCallbacks = snackStorage
-        .map(
-          (_) => _defaultAutoTimer,
-        )
-        .toList(growable: false);
-
-    var vendingState = await _dbService.vendingState;
-    if (!coinStorage.canReturnAmount(vendingState.credit)) {
-      vendingState = IdleState(numberPadState: NumberPadState.init());
-    }
+    final coinStorage = await _dbService.coinStorage;
+    final change = await _dbService.coinChange;
+    final snackStorage = await _dbService.snackStacks;
+    final vendingState = await _dbService.vendingState;
+    _dispenseAnimationCallbacks = [
+      for (int i = 0; i < snackSlotCount; i++) _defaultAutoTimer,
+    ];
     return SnackMachineState(
       coinStorage: coinStorage,
       changeSlot: change,
@@ -114,15 +96,29 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
       vendingState: vendingState,
     );
   }
+  //                          .       .    o8o
+  //                      .o8     .o8    `"'
+  //  .oooo.o  .ooooo.  .o888oo .o888oo oooo  ooo. .oo.    .oooooooo  .oooo.o
+  // d88(  "8 d88' `88b   888     888   `888  `888P"Y88b  888' `88b  d88(  "8
+  // `"Y88b.  888ooo888   888     888    888   888   888  888   888  `"Y88b.
+  // o.  )88b 888    .o   888 .   888 .  888   888   888  `88bod8P'  o.  )88b
+  // 8""888P' `Y8bod8P'   "888"   "888" o888o o888o o888o `8oooooo.  8""888P'
+  //                                                      d"     YD
+  //                                                      "Y88888P'
 
-  /// set the callback for when the machine enters the [DispenseSnackState] to dispense the snack with the passed index.
+  static const _autoResetTimerDuration = 30;
+
+  /// set the callback for when the machine enters the [DispenseSnackState] to dispense the snack within the slot of the passed id.
   ///
   /// Use to start the dispensing process in the UI (eg animations etc.)
   ///
   /// The notifier will then wait for the returned Future to resolve to go to the next state
-  void setDispenseCallBack(int index, Future<void> Function() cb) {
-    if (index < 0 || index >= _dispenseAnimationCallbacks.length) return;
-    _dispenseAnimationCallbacks[index] = cb;
+  void setDispenseCallBack(int slotID, Future<void> Function() cb) {
+    if (slotID < 0 || slotID >= _dispenseAnimationCallbacks.length) return;
+    _dispenseAnimationCallbacks[slotID] = () async {
+      _animationRunning = true;
+      await cb();
+    };
   }
 
   SnackMachineState? _tryFetchState() {
@@ -131,6 +127,35 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
       (value) => maybeState = value,
     );
     return maybeState!;
+  }
+
+  @override
+  set state(newState) {
+    _resetTimer?.cancel();
+
+    state.whenData(
+      (value) {},
+    );
+    newState.whenData(
+      (value) {
+        if (value.vendingState is ManualState &&
+            (value.vendingState as ManualState).autoReset) {
+          _resetTimer = Timer(
+            Duration(seconds: _autoResetTimerDuration),
+            _reset,
+          );
+        }
+        if (value.vendingState is DispenseSnackState && !_animationRunning) {
+          _dispenseAnimationCallbacks[value.vendingState.selectedSlot!]().then(
+            (_) {
+              onFinished();
+              _animationRunning = false;
+            },
+          );
+        }
+      },
+    );
+    super.state = newState;
   }
 
   // 8b           d8  88888888888  888b      88  88888888ba,
@@ -182,88 +207,20 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
   }
 
   set _vendingState(VendingState newState) {
-    if (newState is DispenseSnackState) {
-      final value = newState.selectedSlot;
-      state.whenData(
-        (state) {
-          if (state.getSlot(value)!.isEmpty) {
-            newState = NoSelectionState(
-              credit: newState.credit,
-              numberPadState: numberPadState,
-            );
-          }
-        },
+    _resetTimer?.cancel();
+
+    if (newState is ReturnCoinsState) {
+      _defaultAutoTimer().then(
+        (_) => onFinished(),
       );
     }
-    _dbService.updateVendingState(newState).then(
-      (_) {
-        state = state.whenData(
-          (value) => value.copyWith(vendingState: newState),
-        );
-        _resetTimer?.cancel();
-
-        if (_vendingState is ManualState &&
-            _vendingState is! IdleState &&
-            _vendingState is! ErrorState) {
-          _resetTimer = Timer(
-            Duration(seconds: 30),
-            _reset,
-          );
-        } else if (_vendingState is ReturnCoinsState) {
-          _defaultAutoTimer().then(
-            (_) => onFinished(),
-          );
-        } else if (_vendingState is DispenseSnackState) {
-          _dispenseAnimationCallbacks[_vendingState.selectedSlot!]().then(
-            (_) => onFinished(),
-          );
-        }
-        if (_vendingState is ManualState) {
-          _checkPaidAndDispense();
-        }
-      },
+    state = state.whenData(
+      (value) => value.copyWith(vendingState: newState),
     );
+    _dbService.updateVendingState(newState);
   }
 
-  // {
-  //   vending_type: NoSelectionState,
-  //   vending_slot: null,
-  //   vending_credit: 200
-  // }
-  /* 
-  ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: SqfliteFfiException(sqlite_error: 1, , SqliteException(1): while preparing statement, near ",": syntax error, SQL logic error (code 1)
-  Causing statement (at position 103): UPDATE VENDINGSTATES SET vending_type = ?, vending_slot = NULL, vending_credit = ? WHERE vending_id = ?,})
-  */
   Timer? _resetTimer;
-
-  void _checkPaidAndDispense() {
-    int? snackIndex = _vendingState.selectedSlot;
-    int? price;
-
-    state.whenData(
-      (value) => price = value.getSlot(snackIndex)?.snackPrice,
-    );
-    if (price == null || _vendingState.credit < price!) return;
-    // price != null => snack is selected!
-    if (checkForChange(
-          _vendingState.credit - price!,
-        ) !=
-        null) {
-      // Rückgeld möglich, Ausgabe
-      _vendingState = DispenseSnackState(
-        credit: _vendingState.credit - price!,
-        selectedSlot: _vendingState.selectedSlot,
-      );
-    } else {
-      // Rückgeld nicht möglich, Auswahl aufheben
-      _vendingState = NoSelectionState(
-        credit: _vendingState.credit,
-        displayMessage: 'Rückgeld nicht möglich',
-        mode: LcdMessageMode.warning,
-        numberPadState: NumberPadState.init(),
-      );
-    }
-  }
 
   // 88888888888
   // 88                                              ,d
@@ -278,15 +235,25 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
   void onCoinInserted(Coin coin) {
     if (!_vendingState.acceptsInput) return;
     //  CoinStack? storage;
-    _vendingState = _vendingState.onCoinInserted(coin);
+    VendingState newVendingState = _vendingState.onCoinInserted(coin);
+
     state = state.whenData(
-      (value) {
-        final newState = value.insertCoin(coin);
-        _coinStorage = newState.coinStorage;
-        return newState;
+      (state) {
+        final newState = state
+            .insertCoin(coin)
+            .copyWith(vendingState: newVendingState);
+        final slotID = _vendingState.selectedSlot;
+
+        if (slotID != null && newState.canDispenseSnack(slotID)) {
+          newVendingState = DispenseSnackState(
+            credit: newVendingState.credit - state.getSlot(slotID)!.snackPrice,
+            selectedSlot: slotID,
+          );
+        }
+        return newState.copyWith(vendingState: newVendingState);
       },
     );
-    _checkPaidAndDispense();
+    // _checkPaidAndDispense();
   }
 
   /// call, when the user prsses the snack machine's return button
@@ -306,7 +273,6 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
 
   void _reset() {
     _vendingState = _vendingState.onReturnPressed();
-    // vendingState = IdleState(numberPadState: NumberPadState.init());
   }
 
   void _deselectSnack() {
@@ -336,23 +302,34 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     if (!_vendingState.acceptsInput) return;
     final currentNumState = numberPadState;
     final newNumPadState = currentNumState.input(digit);
-    VendingState newState = _vendingState.setNumPadState(newNumPadState);
+
+    VendingState newVendingState = _vendingState.setNumPadState(newNumPadState);
     state.whenData(
       (state) {
         if (newNumPadState.value == null) return;
+
         final slot = state.getSlot(newNumPadState.value);
+
         if (slot == null || slot.isEmpty) {
-          newState = newState = NoSelectionState(
-            credit: newState.credit,
+          newVendingState = newVendingState = NoSelectionState(
+            credit: newVendingState.credit,
             numberPadState: NumberPadState.init(),
             displayMessage: slot == null
                 ? 'Fach existiert nicht!'
                 : 'Fach ist leer :(',
           );
+          return;
         }
+        final nextState = state.copyWith(vendingState: newVendingState);
+        if (nextState.canDispenseSnack(slot.id)) {
+          newVendingState = DispenseSnackState(
+            credit: newVendingState.credit - slot.snackPrice,
+            selectedSlot: slot.id,
+          );
+        } else {}
       },
     );
-    _vendingState = newState;
+    _vendingState = newVendingState;
   }
 
   /// call to reset the Number pad (sets all digits to null)
@@ -410,32 +387,31 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     return success;
   }
 
-  /// the machine dispenses the snack at [index]
-  void dispenseSnack(int index) {
+  /// the machine dispenses the snack at [slotID]
+  void dispenseSnack(int slotID) {
     final maybeState = _tryFetchState();
     if (maybeState == null) return;
 
-    var stack = maybeState.getSlot(index);
+    var stack = maybeState.getSlot(slotID);
     assert(
       stack != null,
-      'Error while dispensing snack: SnackSlot with index $index not found!',
+      'Error while dispensing snack: SnackSlot with index $slotID not found!',
     );
     stack = stack!;
 
-    if (!maybeState.snackAvailable(index)) return;
-    _dbService.updateSnackStackCount(index, stack.count - 1).then(
-      (_) {
-        state = state.whenData((current) {
-          final storage = current.snackStorage.toList();
-          final currentStack = storage[index];
-          storage[index] = currentStack.copyWith(count: currentStack.count - 1);
-          return current.copyWith(
-            snackStorage: storage,
-            ejectedSnackIds: [...current.ejectedSnackIds, currentStack.snackID],
-          );
-        });
-      },
+    if (!maybeState.snackAvailable(slotID)) return;
+
+    final storage = maybeState.snackStorage.toList();
+
+    storage[slotID] = stack.copyWith(count: stack.count - 1);
+    state = AsyncData(
+      maybeState.copyWith(
+        snackStorage: storage,
+        ejectedSnackIndex: stack.snackIndex,
+        // vendingState: (_vendingState as DispenseSnackState).onFinished()
+      ),
     );
+    _dbService.updateSnackStackCount(slotID, stack.count - 1);
   }
 
   /// removes all the coins in the change slot and returns it
@@ -459,11 +435,19 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
 
   /// sets all snack stacks back to contain 5 snacks, minimum of 1
   void refillSnacks([int count = 5]) {
-    for (int i = 0; i < snacks.length; i++) {
-      _dbService.updateSnackStackCount(i, max(count, 1));
-    }
-    _dbService.getSnackStacks().then(
-      (stacks) {
+    state.whenData(
+      (st) async {
+        final notEmpty = st.snackStorage.where(
+          (element) => element.snackIndex != null,
+        );
+        for (final slot in notEmpty) {
+          await _dbService.updateSnackStackCount(
+            slot.snackIndex!,
+            max(count, 1),
+          );
+        }
+        final stacks = await _dbService.snackStacks;
+
         state = state.whenData(
           (state) {
             return state.copyWith(snackStorage: stacks);
@@ -486,4 +470,43 @@ $storage
 Change: \n
 $change
 ''';
+
+  //                 .o8                     o8o
+  //                "888                     `"'
+  //  .oooo.    .oooo888  ooo. .oo.  .oo.   oooo  ooo. .oo.
+  // `P  )88b  d88' `888  `888P"Y88bP"Y88b  `888  `888P"Y88b
+  //  .oP"888  888   888   888   888   888   888   888   888
+  // d8(  888  888   888   888   888   888   888   888   888
+  // `Y888""8o `Y8bod88P" o888o o888o o888o o888o o888o o888o
+
+  /// puts the snack with [snackIndex] into the slot with ID [slotID]
+  ///
+  /// if [snackIndex] is negative, the conained snack is removed
+  void setSnackSlot(int slotID, int snackIndex) {
+    if (slotID < 0 || slotID >= snackSlotCount || snackIndex >= snacks.length) {
+      return;
+    }
+    int? indexOrNull = snackIndex < 0 ? null : snackIndex;
+
+    _dbService.changeSnackStack(slotID, indexOrNull, 5).then(
+      (success) {
+        if (success) {
+          final fState = _tryFetchState();
+          assert(fState != null);
+          final slots = fState!.snackStorage.toList();
+          final s = slots[slotID];
+
+          slots[slotID] = s.copyWith(count: 5, snackIndex: indexOrNull);
+
+          state = state.whenData(
+            (value) {
+              return value.copyWith(
+                snackStorage: slots,
+              );
+            },
+          );
+        }
+      },
+    );
+  }
 }

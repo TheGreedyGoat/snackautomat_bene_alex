@@ -7,11 +7,14 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ve
 
 /// abstract class for VendingStates that wmainly wait for a user input (Insert a coin, press return etc.)
 abstract class ManualState extends VendingState {
+  final bool autoReset;
+
   /// abstract class for VendingStates that wmainly wait for a user input (Insert a coin, press return etc.)
   ManualState({
     required super.credit,
     required super.displayMessage,
     required super.numberPadState,
+    required this.autoReset,
     super.selectedSlot,
     super.mode,
   }) : super(acceptsInput: true);

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
+import 'package:snackautomat_bene_alex/back_layer/database_service.dart';
 import 'package:snackautomat_bene_alex/test_app/temp_test_app.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:window_size/window_size.dart';
@@ -15,10 +16,15 @@ Future<void> main() async {
     await _configureDesktopWindow();
   }
 
+DataBaseService get _dBService => DataBaseService.instance;
+void main() async {
   if (Platform.isWindows || Platform.isLinux) {
     sqfliteFfiInit();
   }
   databaseFactory = databaseFactoryFfi;
+  // await DataBaseService.instance.removeDatabase();
+  // print('deleted');
+  // await _dBService.showDataBase();
   runTestApp();
 }
 

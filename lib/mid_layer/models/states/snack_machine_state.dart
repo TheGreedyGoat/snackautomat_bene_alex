@@ -52,14 +52,24 @@ class SnackMachineState with _$SnackMachineState {
   }
 
   /// Returns the slot with the given index if existing
-  SnackStack? getSlot(int? index) =>
-      index == null || index >= snackStorage.length
+  SnackStack? getSlot(int? slotID) =>
+      slotID == null || slotID >= snackStorage.length
       ? null
-      : snackStorage[index];
+      : snackStorage[slotID];
 
   /// returns true if the slotindex exists and the slot is not empty, false else
   bool snackAvailable(int? index) {
     final slot = getSlot(index);
     return slot != null && slot.isNotEmpty;
+  }
+
+  bool canDispenseSnack(int slotID) {
+    final slot = getSlot(slotID);
+    if (slot == null || slot.isEmpty) return false;
+    return
+    // genug bezahlt
+    vendingState.credit >= slot.snackPrice &&
+        // Rückgeld möglich
+        coinStorage.canReturnAmount(vendingState.credit - slot.snackPrice);
   }
 }

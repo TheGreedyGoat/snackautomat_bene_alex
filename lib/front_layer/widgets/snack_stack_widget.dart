@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/snack_selection_modal.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 import 'metal_gate.dart';
@@ -25,16 +26,35 @@ class SnackStackWidget extends StatefulWidget {
     this.gateOffsetY = 0,
     this.stackBias = 1,
     this.dispense = false,
+    //! MY 
+class SnackStackWidget extends ConsumerStatefulWidget {
+  final int stackId;
+  final void Function() onAnimationFinished;
+  const SnackStackWidget({
+    super.key,
+    required this.stackId,
+    required this.onAnimationFinished,
   });
-
   @override
-  State<SnackStackWidget> createState() => _SnackStackWidgetState();
+  ConsumerState<SnackStackWidget> createState() => _SnackStackWidgetState();
 }
 
 class _SnackStackWidgetState extends State<SnackStackWidget>
     with TickerProviderStateMixin {
+  //! MY
+class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
+    with SingleTickerProviderStateMixin {
   static const double _cardExtent = 188;
-  late int snackCount;
+  int get snackCount {
+    int count = 0;
+    ref.watch(snackMachineProvider).whenData(
+      (state) {
+        count = state.getSlot(widget.stackId)!.count;
+      },
+    );
+
+    return count;
+  }
 
   late AnimationController controller;
   late AnimationController gateController;
@@ -52,11 +72,22 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
 
   final GlobalKey stackKey = GlobalKey();
 
+  int get stackID => widget.stackId;
+
+  SnackStack get stack {
+    SnackStack? stack;
+    ref
+        .watch(snackMachineProvider)
+        .whenData(
+          (value) => stack = value.getSlot(stackID),
+        );
+    assert(stack != null, 'Stack $stackID not fount for SnackStackWidget');
+    return stack!;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    snackCount = widget.stack.count;
 
     controller = AnimationController(
       vsync: this,
@@ -71,9 +102,9 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
   @override
   void didUpdateWidget(covariant SnackStackWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.stack.count != widget.stack.count && !removing) {
-      snackCount = widget.stack.count;
-    }
+    // if (oldWidget.stackId.count != widget.stackId.count && !removing) {
+    //   snackCount = widget.stackId.count;
+    // }
   }
 
   @override
@@ -174,8 +205,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
         return AnimatedBuilder(
           animation: controller,
           child: ThickSnackCard(
-            snack: widget.stack.snack,
-            index: widget.stack.snackID,
+            snackIndex: stack.snackIndex!,
           ),
           builder: (_, child) {
             return Positioned(
@@ -209,10 +239,7 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
       removing = false;
     });
     controller.reset();
-  }
-
-  void handleTap() {
-    removeSnack();
+    print('Remove has finished!');
   }
 
   @override
@@ -282,6 +309,47 @@ class _SnackStackWidgetState extends State<SnackStackWidget>
               ),
             ),
           ],
+          //! MY
+            .setDispenseCallBack(stackID, removeSnack);
+        return GestureDetector(
+          onTap: () async {
+            final int? snackIndex = await showModalBottomSheet<int>(
+              context: context,
+              builder: (context) => SnackSelectionModal(),
+            );
+            if (snackIndex == null) return;
+            ref
+                .read(snackMachineProvider.notifier)
+                .setSnackSlot(widget.stackId, snackIndex);
+          },
+          child: SizedBox(
+            key: stackKey,
+            width: 200,
+            height: 216,
+            child: stack.isNotEmpty
+                ? Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      for (int i = snackCount - 1; i >= 0; i--)
+                        AnimatedPositioned(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                          bottom: i * 6.3,
+                          left: i * 2,
+                          child: Opacity(
+                            opacity: (i == 0 && removing) ? 0 : 1,
+                            child: SnackCard(
+                              snackIndex: stack.snackIndex!,
+                              slotID: widget.stackId,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                : Card(
+                    color: Colors.grey,
+                  ),
+          ),
         );
       },
     );

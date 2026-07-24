@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 
 import 'backgrounds_overlays/glass_pane.dart';
@@ -5,7 +6,6 @@ import 'backgrounds_overlays/glass_pane.dart';
 /// Glass door that can swing open. Hinges are on the left.
 class VendingDisplay extends StatefulWidget {
   final Widget child;
-
   const VendingDisplay({
     super.key,
     required this.child,
@@ -101,11 +101,11 @@ class _VendingDisplayState extends State<VendingDisplay>
 /// The glass part of the door, with some extra layers for fake thickness
 class _GlassDoor extends StatelessWidget {
   final bool showThickness;
-
+  //! This is the glass door
   const _GlassDoor({required this.showThickness});
 
   static const double _thickness = 26;
-  static const int _layers = 13;
+  static const int _layers = 2;
 
   @override
   Widget build(BuildContext context) {
