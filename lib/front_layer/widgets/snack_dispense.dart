@@ -45,7 +45,7 @@ class _SnackDispenseState extends ConsumerState<SnackDispense>
       loading: () => const Placeholder(color: Colors.yellow),
       error: (_, _) => const Placeholder(color: Colors.red),
       data: (state) {
-        final snacks = state.ejectedSnacks;
+        final snackIndices = state.ejectedSnackIds;
 
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -55,20 +55,22 @@ class _SnackDispenseState extends ConsumerState<SnackDispense>
               fit: StackFit.expand,
               children: [
                 const ColoredBox(color: Color(0xFF141414)),
-                if (snacks.isNotEmpty)
+                if (snackIndices.isNotEmpty)
                   Center(
                     child: SizedBox(
-                      width: _snackSize + (snacks.length - 1) * _stepX,
+                      width: _snackSize + (snackIndices.length - 1) * _stepX,
                       height: _snackSize,
                       child: Stack(
                         children: [
-                          for (var i = 0; i < snacks.length; i++)
+                          for (var i = 0; i < snackIndices.length; i++)
                             Positioned(
                               left: i * _stepX,
                               width: _snackSize,
                               height: _snackSize,
                               child: FittedBox(
-                                child: SnackCard(snack: snacks[i], index: i),
+                                child: SnackCard(
+                                  snackIndex: snackIndices[i],
+                                ),
                               ),
                             ),
                         ],
@@ -86,7 +88,10 @@ class _SnackDispenseState extends ConsumerState<SnackDispense>
                       decoration: BoxDecoration(
                         color: const Color(0xFF6B3E2A),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFF3A2418), width: 2),
+                        border: Border.all(
+                          color: const Color(0xFF3A2418),
+                          width: 2,
+                        ),
                       ),
                       child: const Center(
                         child: SizedBox(

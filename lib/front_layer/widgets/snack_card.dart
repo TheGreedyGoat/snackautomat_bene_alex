@@ -73,8 +73,8 @@ class SnackCard extends StatelessWidget {
       elevation: 20,
       color: Color.fromARGB(
         255,
-        255 - index * 10,
-        191 - index * 10,
+        255 - snackIndex * 10,
+        191 - snackIndex * 10,
         0,
       ),
       shape: RoundedRectangleBorder(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/snack_selection_modal.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/automatic/dispense_snack_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/snack_stack_widget.dart';
@@ -45,10 +46,16 @@ class _SnackGrid extends ConsumerWidget {
   static const rows = 4;
 
   // fixed layout
+  //? V2 values
   static const startX = 43.0;
-  static const startY = 30.0;
+  static const startY = 29.5;
   static const slotW = 121.0;
-  static const slotH = 136.0;
+  static const slotH = 157.0;
+  //? V1 Values
+  // static const startX = 43.0;
+  // static const startY = 30.0;
+  // static const slotW = 121.0;
+  // static const slotH = 136.0;
   static const snackSize = 90.0;
   static const gateWidth = 100.0;
   static const gateOffsetY = -40.0; // how far below the snack stack
@@ -68,32 +75,51 @@ class _SnackGrid extends ConsumerWidget {
 
         return Stack(
           children: [
-            for (var i = 0; i < columns * rows && i < slots.length; i++) ...[
+            for (
+              var slotID = 0;
+              slotID < columns * rows && slotID < slots.length;
+              slotID++
+            ) ...[
               Positioned(
-                left: startX + (i % columns) * slotW + (slotW - cellW) / 2,
-                top: startY + (i ~/ columns) * slotH,
+                left: startX + (slotID % columns) * slotW + (slotW - cellW) / 2,
+                top: startY + (slotID ~/ columns) * slotH,
                 width: cellW,
                 height: slotH,
-                child: SnackStackWidget(
-                  stack: slots[i],
-                  snackSize: snackSize,
-                  gateWidth: gateWidth,
-                  gateOffsetY: gateOffsetY,
-                  // left 3 cols lean right, right 3 lean left; stronger farther outfrom the middle
-                  stackBias:
-                      ((columns - 1) / 2 - (i % columns)) / ((columns - 1) / 3),
-                  dispense:
-                      state.vendingState is DispenseSnackState && selected == i,
-                  onAnimationFinished: () =>
-                      ref.read(snackMachineProvider.notifier).onFinished(),
+                child: GestureDetector(
+                  onTap: () async {
+                    final int? snackIndex = await showModalBottomSheet<int>(
+                      context: context,
+                      builder: (context) => SnackSelectionModal(),
+                    );
+                    if (snackIndex == null) return;
+                    ref
+                        .read(snackMachineProvider.notifier)
+                        .setSnackSlot(slotID, snackIndex);
+                  },
+                  child: SnackStackWidget(
+                    slotID: slotID,
+                    snackSize: snackSize,
+                    gateWidth: gateWidth,
+                    gateOffsetY: gateOffsetY,
+                    // left 3 cols lean right, right 3 lean left; stronger farther outfrom the middle
+                    stackBias:
+                        ((columns - 1) / 2 - (slotID % columns)) /
+                        ((columns - 1) / 3),
+                    dispense:
+                        state.vendingState is DispenseSnackState &&
+                        selected == slotID,
+                    onAnimationFinished: () =>
+                        ref.read(snackMachineProvider.notifier).onFinished(),
+                  ),
                 ),
               ),
               Positioned(
-                left: startX + (i % columns) * slotW,
-                top: startY + (i ~/ columns) * slotH + slotH + labelOffsetY,
+                left: startX + (slotID % columns) * slotW,
+                top:
+                    startY + (slotID ~/ columns) * slotH + slotH + labelOffsetY,
                 width: slotW,
                 child: Text(
-                  i.toString().padLeft(3, '0'),
+                  slotID.toString().padLeft(3, '0'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'FixedSys',

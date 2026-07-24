@@ -407,7 +407,8 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     state = AsyncData(
       maybeState.copyWith(
         snackStorage: storage,
-        ejectedSnackIndex: stack.snackIndex,
+
+        ejectedSnackIds: [stack.snackIndex!],
         // vendingState: (_vendingState as DispenseSnackState).onFinished()
       ),
     );

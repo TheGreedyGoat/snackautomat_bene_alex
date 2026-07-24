@@ -9,22 +9,20 @@ import 'package:window_size/window_size.dart';
 // fixed window size — not resizable (tweak if needed)
 const Size _windowSize = Size(1200, 1300);
 
-Future<void> main() async {
+// Future<void> main() async {
+
+DataBaseService get _dBService => DataBaseService.instance;
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await _configureDesktopWindow();
   }
-
-DataBaseService get _dBService => DataBaseService.instance;
-void main() async {
   if (Platform.isWindows || Platform.isLinux) {
     sqfliteFfiInit();
   }
   databaseFactory = databaseFactoryFfi;
-  // await DataBaseService.instance.removeDatabase();
-  // print('deleted');
-  // await _dBService.showDataBase();
+  await _resetDatabase();
   runTestApp();
 }
 
@@ -43,4 +41,9 @@ Future<void> _configureDesktopWindow() async {
   setWindowFrame(Rect.fromLTWH(left, top, width, height));
   setWindowMinSize(size);
   setWindowMaxSize(size);
+}
+
+Future<void> _resetDatabase() async {
+  await DataBaseService.instance.removeDatabase();
+  print('deleted');
 }
