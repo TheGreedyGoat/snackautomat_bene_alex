@@ -315,7 +315,7 @@ class DataBaseService {
     );
   }
 
-  Future<bool> changeSnackStack(int stackID, int snackIndex, int count) async {
+  Future<bool> changeSnackStack(int stackID, int? snackIndex, int count) async {
     if (!(await _checkExist(
       _snackStackTableName,
       '$_snackStackIDColumnName = ?',

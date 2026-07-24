@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/coin_purse.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/control_pad.dart';
-import 'package:snackautomat_bene_alex/front_layer/widgets/info_screen.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/info_screen_2.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/inventory_overview.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/nuka_cola_sign.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty_rounded_box.dart';
@@ -43,9 +44,9 @@ class VendingMachinePage extends StatelessWidget {
                         Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(
-                              maxWidth: 500.0,
+                              maxWidth: 300.0,
                             ),
-                            child: InfoScreen(),
+                            child: InfoScreen2(),
                           ),
                         ),
                       ],
@@ -54,22 +55,40 @@ class VendingMachinePage extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Card(
-                              margin: EdgeInsets.all(4.0),
-                              color: const Color.fromARGB(255, 243, 210, 196),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SnackView(),
-                              ),
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Rusty(
+                                      // margin: EdgeInsets.all(4.0),
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          243,
+                                          210,
+                                          196,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SnackView(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(
+                                  height: 150,
+                                  child: SnackDispense(),
+                                ),
+                              ],
                             ),
                           ),
                           SizedBox(width: 300, child: ControlPad()),
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      height: 200,
-                      child: SnackDispense(),
                     ),
                   ],
                 ),

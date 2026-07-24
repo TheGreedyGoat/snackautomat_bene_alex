@@ -43,21 +43,22 @@ class _InfoScreenState extends ConsumerState<InfoScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(snackMachineProvider);
     return LcdDisplay(
-      height: 300,
+      height: 200,
       child: state.when(
         data: (state) {
           final selectedSlot = state.getSlot(state.vendingState.selectedSlot);
+          final selectedSnack = selectedSlot?.snack;
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 LcdTitle(title),
-                LcdText('${state.vendingState.runtimeType}'),
+                // LcdText('${state.vendingState.runtimeType}'),
                 Row(
                   children: [
                     const NukaColaAscii(
-                      fontSize: 13,
+                      fontSize: 10,
                     ),
                     Expanded(
                       child: Row(

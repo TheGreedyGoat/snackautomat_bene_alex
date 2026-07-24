@@ -14,12 +14,19 @@ class SnackSelectionModal extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
-          itemCount: snacks.length,
+          itemCount: snacks.length + 1,
           itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SnackSelectionTile(snackIndex: index),
-            );
+            return index == 0
+                ? ListTile(
+                    onTap: () {
+                      Navigator.pop(context, -1);
+                    },
+                    title: Text('Remove Item'),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SnackSelectionTile(snackIndex: index - 1),
+                  );
           },
         ),
       ),
@@ -35,15 +42,12 @@ class SnackSelectionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: InkWell(
-        onTap: () {
-          print(snack.name);
-          Navigator.pop(context, snackIndex);
-        },
-        child: SnackCard(
-          snackIndex: snackIndex,
-          showPriceAndCode: false,
-        ),
+      onTap: () {
+        Navigator.pop(context, snackIndex);
+      },
+      title: SnackCard(
+        snackIndex: snackIndex,
+        showPriceAndCode: false,
       ),
     );
   }

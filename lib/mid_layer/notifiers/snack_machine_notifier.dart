@@ -321,7 +321,6 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
           );
           return;
         }
-
         final nextState = state.copyWith(vendingState: newVendingState);
         if (nextState.canDispenseSnack(slot.id)) {
           newVendingState = DispenseSnackState(
@@ -481,14 +480,16 @@ $change
   // d8(  888  888   888   888   888   888   888   888   888
   // `Y888""8o `Y8bod88P" o888o o888o o888o o888o o888o o888o
 
+  /// puts the snack with [snackIndex] into the slot with ID [slotID]
+  ///
+  /// if [snackIndex] is negative, the conained snack is removed
   void setSnackSlot(int slotID, int snackIndex) {
-    if (slotID < 0 ||
-        slotID >= snackSlotCount ||
-        snackIndex < 0 ||
-        snackIndex >= snacks.length) {
+    if (slotID < 0 || slotID >= snackSlotCount || snackIndex >= snacks.length) {
       return;
     }
-    _dbService.changeSnackStack(slotID, snackIndex, 5).then(
+    int? indexOrNull = snackIndex < 0 ? null : snackIndex;
+
+    _dbService.changeSnackStack(slotID, indexOrNull, 5).then(
       (success) {
         if (success) {
           final fState = _tryFetchState();
@@ -496,7 +497,7 @@ $change
           final slots = fState!.snackStorage.toList();
           final s = slots[slotID];
 
-          slots[slotID] = s.copyWith(count: 5, snackIndex: snackIndex);
+          slots[slotID] = s.copyWith(count: 5, snackIndex: indexOrNull);
 
           state = state.whenData(
             (value) {

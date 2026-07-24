@@ -7,7 +7,7 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ve
 class IdleState extends ManualState {
   /// the default state, the machine is currently resting
   IdleState({
-    super.displayMessage = 'Willkommen!',
+    super.displayMessage = 'Willkommen!\nGeld einwerfen oder auswählen',
     required super.numberPadState,
     super.mode,
   }) : super(credit: 0, selectedSlot: null, autoReset: false);

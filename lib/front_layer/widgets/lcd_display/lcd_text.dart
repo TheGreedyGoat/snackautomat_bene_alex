@@ -16,10 +16,11 @@ class LcdText extends StatelessWidget {
   ///  - bool [hasError]: if set to true, text will be displayed red, green else
   const LcdText(
     this.data, {
-    this.fontSize = 20,
+    this.fontSize = 17,
     this.mode = LcdMessageMode.normal,
     this.maxLines = 1,
     this.overflow,
+    this.softWrap = false,
     super.key,
   });
 
@@ -28,7 +29,9 @@ class LcdText extends StatelessWidget {
   final LcdMessageMode mode;
 
   final TextOverflow? overflow;
-  final int maxLines;
+  final int? maxLines;
+
+  final bool softWrap;
 
   /// The fontSize to display the text in (default: 20p)
   final double fontSize;
@@ -43,7 +46,7 @@ class LcdText extends StatelessWidget {
         fontSize: fontSize,
       ),
       overflow: overflow,
-      softWrap: false,
+      softWrap: softWrap,
       maxLines: maxLines,
     );
   }
