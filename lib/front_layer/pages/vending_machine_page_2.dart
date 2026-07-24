@@ -71,6 +71,10 @@ class VendingMachinePage2 extends StatelessWidget {
                             width: 300,
                             child: Column(
                               children: [
+                                SizedBox.square(
+                                  dimension: 150,
+                                  child: NukaColaSign(),
+                                ),
                                 InfoScreen2(),
                                 Expanded(child: ControlPad()),
                               ],
