@@ -22,8 +22,8 @@ class SnackMachineState with _$SnackMachineState {
   /// The machine's slots wich contain the snacks the user can select
   final List<SnackStack> snackStorage;
   @override
-  /// The slot where a paid snack is dispensed to
-  final int? ejectedSnackIndex;
+  /// Outputsnacks, can pile up
+  final List<int> ejectedSnackIds;
 
   @override
   /// The machine's current vending state
@@ -36,15 +36,15 @@ class SnackMachineState with _$SnackMachineState {
     required this.coinStorage,
     required this.changeSlot,
     required this.snackStorage,
-    this.ejectedSnackIndex,
+    this.ejectedSnackIds = const [],
     required this.vendingState,
   });
 
-  Snack? get ejectedSnack {
-    return (ejectedSnackIndex != null)
-        ? snacks.elementAtOrNull(ejectedSnackIndex!)
-        : null;
-  }
+  /// all snacks currently in the dispense bay
+  List<Snack> get ejectedSnacks => ejectedSnackIds
+      .map(snacks.elementAtOrNull)
+      .whereType<Snack>()
+      .toList();
 
   /// returns a copy of this with one coin of the given [coinType] added
   SnackMachineState insertCoin(Coin coinType) {

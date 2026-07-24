@@ -1,31 +1,50 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackautomat_bene_alex/front_layer/widgets/backgrounds_overlays/rusty.dart';
 import 'package:snackautomat_bene_alex/front_layer/widgets/snack_selection_modal.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack_stack.dart';
 import 'package:snackautomat_bene_alex/mid_layer/providers.dart';
+import 'metal_gate.dart';
 import 'snack_card.dart';
 
 class SnackStackWidget extends ConsumerStatefulWidget {
-  final int stackId;
+  final int slotID;
+  final bool dispense;
+  final double snackSize;
+  final double gateWidth;
+  final double gateOffsetY;
+
+  /// -1 = stack up-left, +1 = stack up-right. Stronger = farther from center.
+  final double stackBias;
   final void Function() onAnimationFinished;
   const SnackStackWidget({
     super.key,
-    required this.stackId,
+    required this.slotID,
+    required this.snackSize,
+    required this.gateWidth,
     required this.onAnimationFinished,
+    this.gateOffsetY = 0,
+    this.stackBias = 1,
+    this.dispense = false,
   });
+  //! MY
   @override
   ConsumerState<SnackStackWidget> createState() => _SnackStackWidgetState();
 }
 
 class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
+  //! MY
+  // class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
+  //     with SingleTickerProviderStateMixin {
   static const double _cardExtent = 188;
+
   int get snackCount {
     int count = 0;
     ref.watch(snackMachineProvider).whenData(
       (state) {
-        count = state.getSlot(widget.stackId)!.count;
+        count = state.getSlot(widget.slotID)!.count;
       },
     );
 
@@ -33,6 +52,7 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
   }
 
   late AnimationController controller;
+  late AnimationController gateController;
 
   late Animation<double> fall;
   late Animation<double> rotation;
@@ -47,7 +67,7 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
 
   final GlobalKey stackKey = GlobalKey();
 
-  int get stackID => widget.stackId;
+  int get stackID => widget.slotID;
 
   SnackStack get stack {
     SnackStack? stack;
@@ -68,6 +88,10 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
+    gateController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 280),
+    );
   }
 
   @override
@@ -81,6 +105,7 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
   @override
   void dispose() {
     controller.dispose();
+    gateController.dispose();
     super.dispose();
   }
 
@@ -167,6 +192,9 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
       removing = true;
     });
 
+    // open the gate, drop the snack, then close the gate again
+    await gateController.forward();
+
     final entry = OverlayEntry(
       builder: (_) {
         return AnimatedBuilder(
@@ -200,12 +228,11 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
 
     await controller.forward();
     entry.remove();
+    await gateController.reverse();
     if (!mounted) return;
     setState(() {
-      // snackCount--;
       removing = false;
     });
-    // widget.onAnimationFinished();
     controller.reset();
     print('Remove has finished!');
   }
@@ -216,47 +243,123 @@ class _SnackStackWidgetState extends ConsumerState<SnackStackWidget>
       builder: (context, ref, child) {
         ref
             .read(snackMachineProvider.notifier)
-            .setDispenseCallBack(stackID, removeSnack);
-        return GestureDetector(
-          onTap: () async {
-            final int? snackIndex = await showModalBottomSheet<int>(
-              context: context,
-              builder: (context) => SnackSelectionModal(),
-            );
-            if (snackIndex == null) return;
-            ref
-                .read(snackMachineProvider.notifier)
-                .setSnackSlot(widget.stackId, snackIndex);
-          },
-          child: SizedBox(
-            key: stackKey,
-            width: 200,
-            height: 216,
-            child: stack.isNotEmpty
-                ? Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      for (int i = snackCount - 1; i >= 0; i--)
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                          bottom: i * 6.3,
-                          left: i * 2,
-                          child: Opacity(
-                            opacity: (i == 0 && removing) ? 0 : 1,
-                            child: SnackCard(
-                              snackIndex: stack.snackIndex!,
-                              slotID: widget.stackId,
+            .setDispenseCallBack(widget.slotID, removeSnack);
+        final state = ref.watch(snackMachineProvider);
+        return Column(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: widget.snackSize,
+                  height: widget.snackSize,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: SizedBox(
+                      key: stackKey,
+                      width: 200,
+                      height: 216,
+                      child: stack.snackIndex != null && stack.isNotEmpty
+                          ? Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                for (int i = snackCount - 1; i >= 0; i--)
+                                  AnimatedPositioned(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeOut,
+                                    bottom: i * 6.3,
+                                    left: widget.stackBias >= 0
+                                        ? i * 2.0 * widget.stackBias.abs()
+                                        : null,
+                                    right: widget.stackBias < 0
+                                        ? i * 2.0 * widget.stackBias.abs()
+                                        : null,
+                                    child: Opacity(
+                                      opacity: (i == 0 && removing) ? 0 : 1,
+                                      child: SnackCard(
+                                        snackIndex: stack.snackIndex!,
+                                        slotID: widget.slotID,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            )
+                          : Card(
+                              child: SizedBox.square(
+                                dimension: 180,
+                                child: Rusty(
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueGrey,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                    ],
-                  )
-                : Card(
-                    color: Colors.grey,
+                    ),
                   ),
-          ),
+                ),
+              ),
+            ),
+            Center(
+              child: Transform.translate(
+                offset: Offset(0, widget.gateOffsetY),
+                child: SizedBox(
+                  width: widget.gateWidth,
+                  child: AnimatedBuilder(
+                    animation: gateController,
+                    builder: (context, child) {
+                      return MetalGate(
+                        open: Curves.easeInOut.transform(gateController.value),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
+        //! MY
+        //     .setDispenseCallBack(stackID, removeSnack);
+        // return GestureDetector(
+        //   onTap: () async {
+        //     final int? snackIndex = await showModalBottomSheet<int>(
+        //       context: context,
+        //       builder: (context) => SnackSelectionModal(),
+        //     );
+        //     if (snackIndex == null) return;
+        //     ref
+        //         .read(snackMachineProvider.notifier)
+        //         .setSnackSlot(widget.stackID, snackIndex);
+        //   },
+        //   child: SizedBox(
+        //     key: stackKey,
+        //     width: 200,
+        //     height: 216,
+        //     child: stack.isNotEmpty
+        //         ? Stack(
+        //             clipBehavior: Clip.none,
+        //             children: [
+        //               for (int i = snackCount - 1; i >= 0; i--)
+        //                 AnimatedPositioned(
+        //                   duration: const Duration(milliseconds: 300),
+        //                   curve: Curves.easeOut,
+        //                   bottom: i * 6.3,
+        //                   left: i * 2,
+        //                   child: Opacity(
+        //                     opacity: (i == 0 && removing) ? 0 : 1,
+        //                     child: SnackCard(
+        //                       snackIndex: stack.snackIndex!,
+        //                       slotID: widget.stackID,
+        //                     ),
+        //                   ),
+        //                 ),
+        //             ],
+        //           )
+        //         : Card(
+        //             color: Colors.grey,
+        //           ),
+        //   ),
+        // );
       },
     );
   }

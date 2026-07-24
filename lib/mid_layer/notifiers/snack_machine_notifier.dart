@@ -16,7 +16,7 @@ import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/ma
 import 'package:snackautomat_bene_alex/mid_layer/models/states/vending_states/vending_state.dart';
 import 'package:snackautomat_bene_alex/mid_layer/models/snack.dart';
 
-final snacks = [
+final _snackTypes = [
   const Snack(
     name: 'Nuka Cola',
     price: 120,
@@ -64,11 +64,10 @@ final snacks = [
   ),
 ];
 
-/// Placeholder snacks: 16 slots for the 4x4 grid,
-/// the 4 types just repeat until all slots are filled
-// final snacks = [
-//   for (int i = 0; i < 16; i++) _snackTypes[i % _snackTypes.length],
-// ];
+/// 24 slots for the 6x4 metal grid — snack types repeat to fill all slots
+final snacks = [
+  for (int i = 0; i < 24; i++) _snackTypes[i % _snackTypes.length],
+];
 
 /// The core logical unit of the state machine.
 ///
@@ -408,7 +407,8 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     state = AsyncData(
       maybeState.copyWith(
         snackStorage: storage,
-        ejectedSnackIndex: stack.snackIndex,
+
+        ejectedSnackIds: [stack.snackIndex!],
         // vendingState: (_vendingState as DispenseSnackState).onFinished()
       ),
     );
@@ -424,14 +424,14 @@ class SnackMachineNotifier extends AsyncNotifier<SnackMachineState> {
     return change;
   }
 
-  /// removes the snack thats currently in the ejection slot and returns it.
-  Snack? emptyDispenseSlot() {
+  /// removes all snacks from the output bay and returns them
+  List<Snack> emptyDispenseSlot() {
     final maybeState = _tryFetchState();
-    if (maybeState == null) return null;
+    if (maybeState == null) return const [];
 
-    Snack? snack = maybeState.ejectedSnack;
-    state = AsyncData(maybeState.copyWith(ejectedSnackIndex: null));
-    return snack;
+    final taken = maybeState.ejectedSnacks;
+    state = AsyncData(maybeState.copyWith(ejectedSnackIds: const []));
+    return taken;
   }
 
   /// sets all snack stacks back to contain 5 snacks, minimum of 1

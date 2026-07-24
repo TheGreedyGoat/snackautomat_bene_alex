@@ -55,41 +55,27 @@ class VendingMachinePage extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Rusty(
-                                      // margin: EdgeInsets.all(4.0),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          243,
-                                          210,
-                                          196,
-                                        ),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: SnackView(),
-                                      ),
-                                    ),
-                                  ),
+                            child: Center(
+                              child: Card(
+                                margin: const EdgeInsets.all(4.0),
+                                color: const Color.fromARGB(
+                                  255,
+                                  243,
+                                  210,
+                                  196,
                                 ),
-
-                                SizedBox(
-                                  height: 150,
-                                  child: SnackDispense(),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: SnackView(),
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                          SizedBox(width: 300, child: ControlPad()),
+                          const SizedBox(width: 300, child: ControlPad()),
                         ],
                       ),
                     ),
+                    // SizedBox(height: 150, child: SnackDispense()),
                   ],
                 ),
               ),

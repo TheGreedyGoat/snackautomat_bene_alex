@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackautomat_bene_alex/front_layer/pages/vending_machine_page.dart';
+import 'package:snackautomat_bene_alex/front_layer/pages/vending_machine_page_2.dart';
 
 void runTestApp() {
   runApp(
@@ -19,7 +20,7 @@ class VendingTestApp extends StatelessWidget {
       theme: ThemeData.dark(),
       home: Scaffold(
         backgroundColor: Colors.transparent,
-        body: VendingMachinePage(),
+        body: VendingMachinePage2(),
       ),
     );
   }

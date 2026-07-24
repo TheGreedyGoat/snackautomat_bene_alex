@@ -4,7 +4,7 @@ import 'package:snackautomat_bene_alex/mid_layer/notifiers/snack_machine_notifie
 
 import '../../mid_layer/models/snack.dart';
 
-//Fake 3D thickness effect for the snack card
+// Fake 3D look for the snack card (stacked layers behind it)
 class ThickSnackCard extends StatelessWidget {
   final int snackIndex;
   final double thickness;
@@ -71,13 +71,12 @@ class SnackCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 20,
-      // color: Colors.red,
-      // Color.fromARGB(
-      //   255,
-      //   255 - index * 10,
-      //   191 - index * 10,
-      //   0,
-      // ),
+      color: Color.fromARGB(
+        255,
+        255 - snackIndex * 10,
+        191 - snackIndex * 10,
+        0,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -85,51 +84,9 @@ class SnackCard extends StatelessWidget {
       child: SizedBox(
         width: 180,
         height: 180,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                snack.image,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: const Color.fromARGB(200, 0, 0, 0),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 4,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      snack.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (showPriceAndCode && slotID != null)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(slotID.toString().padLeft(3, '0')),
-                          Text(
-                            MoneyConverter.centsToEutoDisplay(snack.price),
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        child: Image.asset(
+          snack.image,
+          fit: BoxFit.cover,
         ),
       ),
     );
